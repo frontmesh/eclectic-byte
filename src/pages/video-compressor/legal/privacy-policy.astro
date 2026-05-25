@@ -1,9 +1,8 @@
 ---
-import { readFileSync } from "node:fs";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { siteConfig, videoCompressorConfig } from "../../../site-config";
+import documentHtml from "../../../../video-compressor/legal/privacy-policy.html?raw";
 
-const documentHtml = readFileSync("video-compressor/legal/privacy-policy.html", "utf-8");
 const structuredData = {
 	"@context": "https://schema.org",
 	"@type": "WebPage",
