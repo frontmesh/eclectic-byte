@@ -1,17 +1,279 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
 
+const pageTitle = "Eclectic Byte";
+const pageDescription =
+	"Eclectic Byte is a compact software studio site with legal resources for the Video Compressor product.";
+
+const legalLinks = [
+	{
+		href: "/video-compressor/legal/privacy-policy",
+		label: "Privacy Policy",
+		description: "How Video Compressor handles account, support, and usage data."
+	},
+	{
+		href: "/video-compressor/legal/terms-of-service",
+		label: "Terms of Service",
+		description: "The operational terms covering access, acceptable use, and support."
+	}
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title={pageTitle} description={pageDescription}>
+	<section class="hero">
+		<div class="hero-copy">
+			<p class="eyebrow">Small software studio</p>
+			<h1>Eclectic Byte ships focused tools without the usual surface noise.</h1>
+			<p class="hero-text">
+				This repository now holds the base Astro site for Eclectic Byte and the first legal set for
+				Video Compressor.
+			</p>
+			<div class="hero-actions">
+				<a class="button button-primary" href="#products">See products</a>
+				<a class="button button-secondary" href="#legal">Open legal docs</a>
+			</div>
+		</div>
+		<div class="hero-panel" aria-label="Eclectic Byte summary">
+			<div class="panel-chip">Current focus</div>
+			<h2>Video Compressor</h2>
+			<p>
+				A straightforward product surface for compressing and exporting video with less friction and
+				clearer defaults.
+			</p>
+			<ul>
+				<li>Static marketing architecture with Astro</li>
+				<li>Dedicated legal document directory at `./video-compressor/legal/`</li>
+				<li>Room to add more product pages without changing the base layout</li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="section" id="studio">
+		<div class="section-heading">
+			<p class="eyebrow">Studio</p>
+			<h2>Built for a quiet, maintainable company presence.</h2>
+		</div>
+		<div class="two-column-grid">
+			<article class="info-card">
+				<h3>Astro is the right default here.</h3>
+				<p>
+					This site is mostly static, content-driven, and legal-page heavy. Astro keeps the output
+					lean, avoids unnecessary client JavaScript, and stays easy to extend when you add more
+					products.
+				</p>
+			</article>
+			<article class="info-card">
+				<h3>Repository structure starts clean.</h3>
+				<p>
+					The project has one reusable layout, one landing page, and source legal documents stored
+					outside `src` so product policy files stay easy to locate.
+				</p>
+			</article>
+		</div>
+	</section>
+
+	<section class="section" id="products">
+		<div class="section-heading">
+			<p class="eyebrow">Products</p>
+			<h2>Initial product area</h2>
+		</div>
+		<article class="product-card">
+			<div>
+				<p class="product-label">Product 01</p>
+				<h3>Video Compressor</h3>
+				<p>
+					The first product namespace in this repo. The legal pages are already separated and linked,
+					so publishing policy URLs later is straightforward.
+				</p>
+			</div>
+			<a class="button button-primary" href="#legal">View legal links</a>
+		</article>
+	</section>
+
+	<section class="section" id="legal">
+		<div class="section-heading">
+			<p class="eyebrow">Legal</p>
+			<h2>Video Compressor legal resources</h2>
+		</div>
+		<div class="two-column-grid">
+			{
+				legalLinks.map((link) => (
+					<a class="legal-card" href={link.href}>
+						<h3>{link.label}</h3>
+						<p>{link.description}</p>
+					</a>
+				))
+			}
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.85fr);
+		gap: var(--space-8);
+		padding: var(--space-8) 0 var(--space-16);
+		align-items: center;
+	}
+
+	.hero-copy h1,
+	.section-heading h2,
+	.product-card h3,
+	.info-card h3,
+	.legal-card h3,
+	.hero-panel h2 {
+		font-family: "Instrument Serif", serif;
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.04em;
+		margin: 0;
+	}
+
+	.hero-copy h1 {
+		font-size: clamp(3.5rem, 9vw, 7rem);
+		max-width: 11ch;
+	}
+
+	.hero-text {
+		font-size: 1.15rem;
+		line-height: 1.75;
+		color: var(--color-muted);
+		max-width: 38rem;
+		margin: var(--space-6) 0 0;
+	}
+
+	.hero-actions {
+		display: flex;
+		gap: var(--space-4);
+		flex-wrap: wrap;
+		margin-top: var(--space-8);
+	}
+
+	.button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		text-decoration: none;
+		border-radius: 999px;
+		padding: 0.9rem 1.25rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+	}
+
+	.button-primary {
+		background: var(--color-ink);
+		color: white;
+	}
+
+	.button-secondary {
+		background: rgba(255, 255, 255, 0.58);
+		border: 1px solid var(--color-border);
+	}
+
+	.hero-panel,
+	.info-card,
+	.product-card,
+	.legal-card {
+		background: var(--color-panel);
+		backdrop-filter: blur(14px);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.hero-panel {
+		padding: clamp(1.5rem, 2vw, 2rem);
+	}
+
+	.panel-chip,
+	.product-label {
+		display: inline-flex;
+		padding: 0.35rem 0.7rem;
+		border-radius: 999px;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--color-accent-deep);
+		background: rgba(239, 125, 66, 0.12);
+	}
+
+	.hero-panel h2 {
+		font-size: clamp(2rem, 3vw, 3rem);
+		margin-top: var(--space-4);
+	}
+
+	.hero-panel p,
+	.hero-panel li,
+	.info-card p,
+	.product-card p,
+	.legal-card p {
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.hero-panel ul {
+		margin: var(--space-6) 0 0;
+		padding-left: 1.2rem;
+	}
+
+	.section {
+		padding: 0 0 var(--space-16);
+	}
+
+	.section-heading {
+		margin-bottom: var(--space-6);
+	}
+
+	.section-heading h2 {
+		font-size: clamp(2.5rem, 5vw, 4rem);
+		max-width: 12ch;
+	}
+
+	.two-column-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-6);
+	}
+
+	.info-card,
+	.legal-card {
+		padding: var(--space-8);
+		text-decoration: none;
+	}
+
+	.info-card h3,
+	.legal-card h3,
+	.product-card h3 {
+		font-size: clamp(1.8rem, 3vw, 2.5rem);
+		margin-bottom: var(--space-4);
+	}
+
+	.product-card {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: var(--space-6);
+		padding: var(--space-8);
+	}
+
+	@media (max-width: 920px) {
+		.hero,
+		.two-column-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.product-card {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.hero-copy h1,
+		.section-heading h2 {
+			max-width: none;
+		}
+	}
+</style>
