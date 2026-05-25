@@ -9,7 +9,6 @@ import {
 
 const pageTitle = siteConfig.siteName;
 const pageDescription = siteConfig.siteDescription;
-const softwareUrl = buildAbsoluteUrl("/#products");
 const websiteUrl = buildAbsoluteUrl("/");
 const structuredData = websiteUrl
 	? [
@@ -27,23 +26,28 @@ const structuredData = websiteUrl
 				applicationCategory: "MultimediaApplication",
 				operatingSystem: "Unspecified",
 				description: videoCompressorConfig.heroDescription,
-				url: softwareUrl
+				url: websiteUrl
 			}
 		]
 	: [];
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} pathname="/" structuredData={structuredData}>
+<BaseLayout
+	title={pageTitle}
+	description={pageDescription}
+	pathname="/"
+	structuredData={structuredData}
+	footerLinks={legalLinks.map(({ href, label }) => ({ href, label }))}
+>
 	<section class="hero">
 		<div class="hero-copy">
 			<p class="eyebrow">Small software studio</p>
 			<h1>Eclectic Byte ships focused tools without the usual surface noise.</h1>
 			<p class="hero-text">
-				This repository now holds the base Astro site for Eclectic Byte and the first legal set for
-				Video Compressor.
+				Eclectic Byte builds and publishes focused software with simple public surfaces and clear legal
+				documentation where it is needed.
 			</p>
 			<div class="hero-actions">
-				<a class="button button-primary" href="#products">See products</a>
 				<a class="button button-secondary" href="#legal">Open legal docs</a>
 			</div>
 		</div>
@@ -51,11 +55,6 @@ const structuredData = websiteUrl
 			<div class="panel-chip">Current focus</div>
 			<h2>{videoCompressorConfig.productName}</h2>
 			<p>{videoCompressorConfig.heroDescription}</p>
-			<ul>
-				<li>Static marketing architecture with Astro</li>
-				<li>Dedicated legal document directory at `./video-compressor/legal/`</li>
-				<li>Room to add more product pages without changing the base layout</li>
-			</ul>
 		</div>
 	</section>
 
@@ -66,39 +65,20 @@ const structuredData = websiteUrl
 		</div>
 		<div class="two-column-grid">
 			<article class="info-card">
-				<h3>Astro is the right default here.</h3>
+				<h3>Quiet by default.</h3>
 				<p>
-					This site is mostly static, content-driven, and legal-page heavy. Astro keeps the output
-					lean, avoids unnecessary client JavaScript, and stays easy to extend when you add more
-					products.
+					Small products need small public surfaces. Eclectic Byte keeps the marketing layer concise,
+					fast, and easy to understand.
 				</p>
 			</article>
 			<article class="info-card">
-				<h3>Repository structure starts clean.</h3>
+				<h3>Clear supporting documents.</h3>
 				<p>
-					The project has one reusable layout, one landing page, and source legal documents stored
-					outside `src` so product policy files stay easy to locate.
+					When a product needs public terms or privacy documentation, those pages stay easy to find
+					and straightforward to read.
 				</p>
 			</article>
 		</div>
-	</section>
-
-	<section class="section" id="products">
-		<div class="section-heading">
-			<p class="eyebrow">Products</p>
-			<h2>Initial product area</h2>
-		</div>
-		<article class="product-card">
-			<div>
-				<p class="product-label">Product 01</p>
-				<h3>{videoCompressorConfig.productName}</h3>
-				<p>
-					The first product namespace in this repo. The legal pages are already separated and linked,
-					so publishing policy URLs later is straightforward.
-				</p>
-			</div>
-			<a class="button button-primary" href="#legal">View legal links</a>
-		</article>
 	</section>
 
 	<section class="section" id="legal">
@@ -130,7 +110,6 @@ const structuredData = websiteUrl
 
 	.hero-copy h1,
 	.section-heading h2,
-	.product-card h3,
 	.info-card h3,
 	.legal-card h3,
 	.hero-panel h2 {
@@ -184,7 +163,6 @@ const structuredData = websiteUrl
 
 	.hero-panel,
 	.info-card,
-	.product-card,
 	.legal-card {
 		background: var(--color-panel);
 		backdrop-filter: blur(14px);
@@ -216,17 +194,10 @@ const structuredData = websiteUrl
 	}
 
 	.hero-panel p,
-	.hero-panel li,
 	.info-card p,
-	.product-card p,
 	.legal-card p {
 		color: var(--color-muted);
 		line-height: 1.7;
-	}
-
-	.hero-panel ul {
-		margin: var(--space-6) 0 0;
-		padding-left: 1.2rem;
 	}
 
 	.section {
@@ -255,29 +226,15 @@ const structuredData = websiteUrl
 	}
 
 	.info-card h3,
-	.legal-card h3,
-	.product-card h3 {
+	.legal-card h3 {
 		font-size: clamp(1.8rem, 3vw, 2.5rem);
 		margin-bottom: var(--space-4);
-	}
-
-	.product-card {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: var(--space-6);
-		padding: var(--space-8);
 	}
 
 	@media (max-width: 920px) {
 		.hero,
 		.two-column-grid {
 			grid-template-columns: 1fr;
-		}
-
-		.product-card {
-			flex-direction: column;
-			align-items: flex-start;
 		}
 	}
 
