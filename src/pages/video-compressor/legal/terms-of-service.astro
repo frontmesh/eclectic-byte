@@ -1,13 +1,24 @@
 ---
 import { readFileSync } from "node:fs";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { siteConfig, videoCompressorConfig } from "../../../site-config";
 
 const documentHtml = readFileSync("video-compressor/legal/terms-of-service.html", "utf-8");
+const structuredData = {
+	"@context": "https://schema.org",
+	"@type": "WebPage",
+	name: `${videoCompressorConfig.productName} Terms of Service`,
+	description: videoCompressorConfig.termsDescription,
+	isPartOf: siteConfig.siteUrl || undefined
+};
 ---
 
 <BaseLayout
 	title="Video Compressor Terms of Service | Eclectic Byte"
 	description="Terms of Service for the Video Compressor product by Eclectic Byte."
+	pathname="/video-compressor/legal/terms-of-service"
+	ogType="article"
+	structuredData={structuredData}
 >
 	<section>
 		<p class="eyebrow">Video Compressor legal</p>

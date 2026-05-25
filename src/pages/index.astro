@@ -1,25 +1,39 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import {
+	buildAbsoluteUrl,
+	legalLinks,
+	siteConfig,
+	videoCompressorConfig
+} from "../site-config";
 
-const pageTitle = "Eclectic Byte";
-const pageDescription =
-	"Eclectic Byte is a compact software studio site with legal resources for the Video Compressor product.";
-
-const legalLinks = [
-	{
-		href: "/video-compressor/legal/privacy-policy",
-		label: "Privacy Policy",
-		description: "How Video Compressor handles account, support, and usage data."
-	},
-	{
-		href: "/video-compressor/legal/terms-of-service",
-		label: "Terms of Service",
-		description: "The operational terms covering access, acceptable use, and support."
-	}
-];
+const pageTitle = siteConfig.siteName;
+const pageDescription = siteConfig.siteDescription;
+const softwareUrl = buildAbsoluteUrl("/#products");
+const websiteUrl = buildAbsoluteUrl("/");
+const structuredData = websiteUrl
+	? [
+			{
+				"@context": "https://schema.org",
+				"@type": "WebSite",
+				name: siteConfig.siteName,
+				url: websiteUrl,
+				description: siteConfig.siteDescription
+			},
+			{
+				"@context": "https://schema.org",
+				"@type": "SoftwareApplication",
+				name: videoCompressorConfig.productName,
+				applicationCategory: "MultimediaApplication",
+				operatingSystem: "Unspecified",
+				description: videoCompressorConfig.heroDescription,
+				url: softwareUrl
+			}
+		]
+	: [];
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} description={pageDescription} pathname="/" structuredData={structuredData}>
 	<section class="hero">
 		<div class="hero-copy">
 			<p class="eyebrow">Small software studio</p>
@@ -35,11 +49,8 @@ const legalLinks = [
 		</div>
 		<div class="hero-panel" aria-label="Eclectic Byte summary">
 			<div class="panel-chip">Current focus</div>
-			<h2>Video Compressor</h2>
-			<p>
-				A straightforward product surface for compressing and exporting video with less friction and
-				clearer defaults.
-			</p>
+			<h2>{videoCompressorConfig.productName}</h2>
+			<p>{videoCompressorConfig.heroDescription}</p>
 			<ul>
 				<li>Static marketing architecture with Astro</li>
 				<li>Dedicated legal document directory at `./video-compressor/legal/`</li>
@@ -80,7 +91,7 @@ const legalLinks = [
 		<article class="product-card">
 			<div>
 				<p class="product-label">Product 01</p>
-				<h3>Video Compressor</h3>
+				<h3>{videoCompressorConfig.productName}</h3>
 				<p>
 					The first product namespace in this repo. The legal pages are already separated and linked,
 					so publishing policy URLs later is straightforward.

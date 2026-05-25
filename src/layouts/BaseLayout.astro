@@ -1,10 +1,41 @@
 ---
+import { buildAbsoluteUrl, siteConfig } from "../site-config";
+
 interface Props {
 	title: string;
 	description: string;
+	pathname?: string;
+	ogType?: "website" | "article";
+	noindex?: boolean;
+	structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description } = Astro.props;
+const {
+	title,
+	description,
+	pathname = Astro.url.pathname,
+	ogType = "website",
+	noindex = !siteConfig.siteUrl,
+	structuredData = []
+} = Astro.props;
+
+const canonicalUrl = buildAbsoluteUrl(pathname);
+const socialImageUrl = buildAbsoluteUrl(siteConfig.socialCardPath);
+const robotsContent = noindex ? "noindex, nofollow" : "index, follow";
+const sitemapHref = siteConfig.siteUrl ? "/sitemap-index.xml" : undefined;
+const structuredDataEntries = Array.isArray(structuredData) ? structuredData : [structuredData];
+const organizationSchema = canonicalUrl
+	? {
+			"@context": "https://schema.org",
+			"@type": siteConfig.companyType,
+			name: siteConfig.siteName,
+			description: siteConfig.siteDescription,
+			url: siteConfig.siteUrl,
+			logo: buildAbsoluteUrl(siteConfig.brandMarkPath)
+		}
+	: undefined;
+
+const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolean);
 ---
 
 <!doctype html>
@@ -14,8 +45,30 @@ const { title, description } = Astro.props;
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
+		<meta name="robots" content={robotsContent} />
+		<meta property="og:site_name" content={siteConfig.siteName} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:locale" content={siteConfig.locale} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+		{sitemapHref && <link rel="sitemap" href={sitemapHref} />}
+		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+		{socialImageUrl && <meta property="og:image" content={socialImageUrl} />}
+		{socialImageUrl && <meta name="twitter:image" content={socialImageUrl} />}
 		<title>{title}</title>
+		{
+			schemaGraph.length > 0 && (
+				<script
+					type="application/ld+json"
+					set:html={JSON.stringify(schemaGraph.length === 1 ? schemaGraph[0] : { "@context": "https://schema.org", "@graph": schemaGraph })}
+				/>
+			)
+		}
 		<style is:global>
 			@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap");
 
@@ -123,6 +176,22 @@ const { title, description } = Astro.props;
 				font-size: 0.95rem;
 			}
 
+			.skip-link {
+				position: absolute;
+				left: 1rem;
+				top: -4rem;
+				z-index: 10;
+				padding: 0.75rem 1rem;
+				border-radius: 999px;
+				background: var(--color-ink);
+				color: white;
+				text-decoration: none;
+			}
+
+			.skip-link:focus {
+				top: 1rem;
+			}
+
 			.legal-prose {
 				background: var(--color-panel);
 				backdrop-filter: blur(14px);
@@ -182,6 +251,7 @@ const { title, description } = Astro.props;
 	</head>
 	<body>
 		<div class="page-shell">
+			<a class="skip-link" href="#main-content">Skip to content</a>
 			<header class="site-header">
 				<a class="brand-lockup" href="/">
 					<span class="brand-mark" aria-hidden="true">EB</span>
@@ -193,11 +263,11 @@ const { title, description } = Astro.props;
 					<a href="/#legal">Legal</a>
 				</nav>
 			</header>
-			<main>
+			<main id="main-content">
 				<slot />
 			</main>
 			<footer class="site-footer">
-				<p>Eclectic Byte builds focused software with clear, durable product surfaces.</p>
+				<p>{siteConfig.siteTagline}</p>
 			</footer>
 		</div>
 	</body>
