@@ -8,6 +8,12 @@ Astro-based company site for Eclectic Byte.
 - `video-compressor/legal/`: source legal documents for the Video Compressor product
 - `eclectic-byte-logo-placeholder.svg`: repository-level placeholder logo asset
 
+## Legal Source Of Truth
+
+- Canonical public legal source: `video-compressor/legal/`
+- Canonical support email for Video Compressor: `eclecticbyte@ymail.com`
+- Keep App Store Connect privacy answers, support metadata, and live legal pages aligned with these files before submission updates
+
 ## Commands
 
 - `npm run dev`
