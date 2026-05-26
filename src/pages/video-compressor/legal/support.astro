@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { siteConfig, videoCompressorConfig } from "../../../site-config";
+
+const structuredData = {
+	"@context": "https://schema.org",
+	"@type": "ContactPage",
+	name: `${videoCompressorConfig.productName} Support`,
+	description: videoCompressorConfig.supportDescription,
+	isPartOf: siteConfig.siteUrl || undefined
+};
+---
+
+<BaseLayout
+	title="Video Compressor Support | Eclectic Byte"
+	description={videoCompressorConfig.supportDescription}
+	pathname="/video-compressor/legal/support"
+	ogType="article"
+	structuredData={structuredData}
+>
+	<section>
+		<p class="eyebrow">Video Compressor legal</p>
+		<div class="legal-prose">
+			<h1>Support</h1>
+			<p><strong>Email:</strong> <a href={`mailto:${videoCompressorConfig.supportEmail}`}>{videoCompressorConfig.supportEmail}</a></p>
+			<p>
+				Contact support for subscription questions, purchase restoration help, premium access issues,
+				or general app support.
+			</p>
+			<h2>What To Include</h2>
+			<ul>
+				<li>A short description of the issue.</li>
+				<li>Your device model and iOS version if the issue is technical.</li>
+				<li>Whether the issue relates to restore purchases, premium access, or export behavior.</li>
+			</ul>
+		</div>
+	</section>
+</BaseLayout>

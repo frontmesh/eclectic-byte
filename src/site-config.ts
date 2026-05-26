@@ -16,8 +16,10 @@ export const videoCompressorConfig = {
 	productName: "Video Compressor",
 	heroDescription:
 		"A straightforward product surface for compressing and exporting video with less friction and clearer defaults.",
-	privacyDescription: "How Video Compressor handles account, support, and usage data.",
-	termsDescription: "The operational terms covering access, acceptable use, and support."
+	privacyDescription: "How Video Compressor handles local processing, subscriptions, and support.",
+	termsDescription: "The operational terms covering subscriptions, acceptable use, and support.",
+	supportEmail: "eclecticbyte@ymail.com",
+	supportDescription: "Support information for Video Compressor, including purchase and subscription help."
 } as const;
 
 export const legalLinks = [
@@ -30,6 +32,11 @@ export const legalLinks = [
 		href: "/video-compressor/legal/terms-of-service",
 		label: "Terms of Service",
 		description: videoCompressorConfig.termsDescription
+	},
+	{
+		href: "/video-compressor/legal/support",
+		label: "Support",
+		description: videoCompressorConfig.supportDescription
 	}
 ] as const;
 
