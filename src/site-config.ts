@@ -107,8 +107,8 @@ export const projects: readonly Project[] = [
 		tags: ["iOS", "Media", "Local-first"],
 		availability: "Live app",
 		link: {
-			href: "#legal",
-			label: "View product resources",
+			href: "/legal/",
+			label: "View legal resources",
 			external: false
 		}
 	}

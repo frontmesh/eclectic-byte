@@ -24,28 +24,28 @@ const { title, description, pathname, eyebrow, heading, intro, meta, ogType, str
 	ogType={ogType}
 	structuredData={structuredData}
 >
-	<div class="blog-page">
-		<header class="blog-header">
+	<div class="page-body">
+		<header class="page-header">
 			<p class="eyebrow">{eyebrow}</p>
-			{meta && <p class="blog-meta"><time datetime={meta.datetime}>{meta.label}</time></p>}
+			{meta && <p class="page-meta"><time datetime={meta.datetime}>{meta.label}</time></p>}
 			<h1>{heading}</h1>
-			{intro && <p class="blog-intro">{intro}</p>}
+			{intro && <p class="page-description">{intro}</p>}
 		</header>
 		<slot />
 	</div>
 </BaseLayout>
 
 <style>
-	.blog-page {
+	.page-body {
 		padding: var(--space-8) 0 var(--space-16);
 	}
 
-	.blog-header {
+	.page-header {
 		max-width: 46rem;
 		margin-bottom: var(--space-12);
 	}
 
-	.blog-header h1 {
+	.page-header h1 {
 		margin: 0;
 		font-family: "Instrument Serif", serif;
 		font-size: clamp(3rem, 7vw, 5.5rem);
@@ -54,13 +54,13 @@ const { title, description, pathname, eyebrow, heading, intro, meta, ogType, str
 		letter-spacing: -0.04em;
 	}
 
-	.blog-meta {
+	.page-meta {
 		margin: 0 0 var(--space-4);
 		color: var(--color-muted);
 		font-size: 0.95rem;
 	}
 
-	.blog-intro {
+	.page-description {
 		max-width: 38rem;
 		margin: var(--space-6) 0 0;
 		color: var(--color-muted);

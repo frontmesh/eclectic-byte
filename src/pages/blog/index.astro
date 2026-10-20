@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import PostList from "../../components/PostList.astro";
-import BlogLayout from "../../layouts/BlogLayout.astro";
+import PageLayout from "../../layouts/PageLayout.astro";
 import { buildAbsoluteUrl, siteConfig } from "../../site-config";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
@@ -29,7 +29,7 @@ const structuredData = blogUrl
 	: [];
 ---
 
-<BlogLayout
+<PageLayout
 	title={`Blog — ${siteConfig.siteName}`}
 	description={description}
 	pathname="/blog/"
@@ -45,7 +45,7 @@ const structuredData = blogUrl
 			<p class="empty-state">No posts have been published yet.</p>
 		)
 	}
-</BlogLayout>
+</PageLayout>
 
 <style>
 	.empty-state {

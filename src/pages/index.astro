@@ -5,7 +5,6 @@ import PostList from "../components/PostList.astro";
 import {
 	buildAbsoluteUrl,
 	habitoroConfig,
-	legalLinks,
 	projects,
 	siteConfig,
 	videoCompressorConfig
@@ -54,7 +53,6 @@ const structuredData = websiteUrl
 	description={pageDescription}
 	pathname="/"
 	structuredData={structuredData}
-	footerLinks={legalLinks.map(({ href, label }) => ({ href, label }))}
 >
 	<section class="hero">
 		<div class="hero-copy">
@@ -144,23 +142,6 @@ const structuredData = websiteUrl
 			</section>
 		)
 	}
-
-	<section class="section" id="legal">
-		<div class="section-heading">
-			<p class="eyebrow">Legal</p>
-			<h2>Video Compressor legal resources</h2>
-		</div>
-		<div class="two-column-grid">
-			{
-				legalLinks.map((link) => (
-					<a class="legal-card" href={link.href}>
-						<h3>{link.label}</h3>
-						<p>{link.description}</p>
-					</a>
-				))
-			}
-		</div>
-	</section>
 </BaseLayout>
 
 <style>
@@ -175,7 +156,6 @@ const structuredData = websiteUrl
 	.hero-copy h1,
 	.section-heading h2,
 	.project-card h3,
-	.legal-card h3,
 	.hero-panel h2 {
 		font-family: "Instrument Serif", serif;
 		font-weight: 400;
@@ -240,8 +220,7 @@ const structuredData = websiteUrl
 		transform: translateY(-2px);
 	}
 
-	.hero-panel,
-	.legal-card {
+	.hero-panel {
 		background: var(--color-panel);
 		backdrop-filter: blur(14px);
 		border: 1px solid var(--color-border);
@@ -270,8 +249,7 @@ const structuredData = websiteUrl
 		margin-top: var(--space-4);
 	}
 
-	.hero-panel p,
-	.legal-card p {
+	.hero-panel p {
 		color: var(--color-muted);
 		line-height: 1.7;
 	}
@@ -458,27 +436,10 @@ const structuredData = websiteUrl
 		flex-wrap: wrap;
 	}
 
-	.two-column-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: var(--space-6);
-	}
-
-	.legal-card {
-		padding: var(--space-8);
-		text-decoration: none;
-	}
-
-	.legal-card h3 {
-		font-size: clamp(1.8rem, 3vw, 2.5rem);
-		margin-bottom: var(--space-4);
-	}
-
 	@media (max-width: 920px) {
 		.hero,
 		.projects-heading,
-		.projects-grid,
-		.two-column-grid {
+		.projects-grid {
 			grid-template-columns: 1fr;
 		}
 	}

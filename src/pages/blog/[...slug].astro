@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
-import BlogLayout from "../../layouts/BlogLayout.astro";
+import PageLayout from "../../layouts/PageLayout.astro";
 import { formatPostDate } from "../../lib/format-date";
 import { buildAbsoluteUrl, siteConfig } from "../../site-config";
 
@@ -35,7 +35,7 @@ const structuredData = postUrl
 	: [];
 ---
 
-<BlogLayout
+<PageLayout
 	title={`${post.data.title} — ${siteConfig.siteName}`}
 	description={post.data.description}
 	pathname={`/blog/${post.id}/`}
@@ -52,7 +52,7 @@ const structuredData = postUrl
 	<footer class="post-footer">
 		<a href="/blog/">← All posts</a>
 	</footer>
-</BlogLayout>
+</PageLayout>
 
 <style>
 	.post-footer {

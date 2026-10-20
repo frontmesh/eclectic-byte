@@ -1,0 +1,76 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import {
+	buildAbsoluteUrl,
+	legalLinks,
+	siteConfig,
+	videoCompressorConfig
+} from "../../site-config";
+
+const description = `Privacy Policy, Terms of Service, and support for ${videoCompressorConfig.productName}.`;
+const heading = `${videoCompressorConfig.productName} legal resources`;
+const legalUrl = buildAbsoluteUrl("/legal/");
+const structuredData = legalUrl
+	? {
+			"@context": "https://schema.org",
+			"@type": "CollectionPage",
+			name: heading,
+			description,
+			url: legalUrl
+		}
+	: [];
+---
+
+<PageLayout
+	title={`Legal — ${siteConfig.siteName}`}
+	description={description}
+	pathname="/legal/"
+	eyebrow="Legal"
+	heading={heading}
+	intro={description}
+	structuredData={structuredData}
+>
+	<div class="legal-grid">
+		{
+			legalLinks.map((link) => (
+				<a class="legal-card" href={link.href}>
+					<h2>{link.label}</h2>
+					<p>{link.description}</p>
+				</a>
+			))
+		}
+	</div>
+</PageLayout>
+
+<style>
+	.legal-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+		gap: var(--space-6);
+	}
+
+	.legal-card {
+		padding: var(--space-8);
+		background: var(--color-panel);
+		backdrop-filter: blur(14px);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+		text-decoration: none;
+	}
+
+	.legal-card h2 {
+		margin: 0 0 var(--space-4);
+		font-family: "Instrument Serif", serif;
+		font-size: clamp(1.8rem, 3vw, 2.5rem);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.04em;
+	}
+
+	.legal-card p {
+		margin: 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+</style>

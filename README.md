@@ -11,6 +11,7 @@ Astro-based company site for Eclectic Byte.
 
 ## Legal Source Of Truth
 
+- Public legal index: `/legal/`
 - Canonical public legal source: `video-compressor/legal/`
 - Canonical support email for Video Compressor: `eclecticbyte@ymail.com`
 - Keep App Store Connect privacy answers, support metadata, and live legal pages aligned with these files before submission updates
