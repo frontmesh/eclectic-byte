@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 190 430 300" role="img" aria-labelledby="title desc">
+  <title id="title">Eclectic Byte brand mark</title>
+  <desc id="desc">The original interlocking navy E and orange B mark, faithfully traced from the approved logo.</desc>
+  <defs>
+    <linearGradient id="navy" x1="900" y1="5200" x2="3300" y2="2400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0C1B28" />
+      <stop offset="1" stop-color="#07121D" />
+    </linearGradient>
+    <linearGradient id="orange" x1="1900" y1="5200" x2="4800" y2="2400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF823B" />
+      <stop offset="1" stop-color="#ED6D30" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 724) scale(.1 -.1)" stroke="none">
+    <path
+      fill="url(#orange)"
+      d="M3285 5018c-3-13-4-158-3-323l3-300 566 4 566 3 6-23c4-13 7-128 7-256 0-175-3-234-12-240-7-4-133-7-280-6l-268 2-1-27c-3-93 3-508 8-512 2-3 113-4 246-3 133 2 257 0 275-3l32-5-2-237-3-237-572-3-573-2v240 240l-207 3c-115 1-245 1-290 0l-83-2v269c0 209-3 270-12 271-26 1-515 1-560 0l-48-1v-270-269l284 6c157 3 296 3 310-1l26-6v-240-240h290 290v-305-305h657 658l212 216 212 216v331 331l-161 155-160 155 160 160 161 161 1 325 1 325-218 212-218 213h-647-648l-5-22Z"
+    />
+    <path
+      fill="url(#navy)"
+      d="m1761 5018-463-8-136-123c-75-67-162-144-193-172l-57-50-1-1005-1-1005 199-203 198-203 696-3 696-3 3 303 3 304-600 2-600 3-3 238-2 237h290 290l-2 273-3 272-153-4c-84-2-213 0-287 4l-135 7v254 254h585 585v-260-261l303 1 302 1 3-270 2-271h249c136 0 269 3 295 6l47 7-2 268-2 269-291 2-291 3-2 260-2 260-306 3-305 2v310 310l-222-2c-123 0-432-5-687-10Z"
+    />
+  </g>
+</svg>

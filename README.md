@@ -7,7 +7,7 @@ Astro-based company site for Eclectic Byte.
 - `src/`: site pages, layouts, components, and configuration
 - `src/content/blog/`: Markdown blog posts
 - `video-compressor/legal/`: source legal documents for the Video Compressor product
-- `public/brand/`: production symbol-only logo asset
+- `public/brand/`: production logo lockup and mark assets in SVG and PNG formats
 
 ## Legal Source Of Truth
 

@@ -9,8 +9,8 @@ export const siteConfig = {
 	locale: "en_US",
 	dateLocale: "en-US",
 	socialCardPath: "/social-card.svg",
-	brandMarkPath: "/brand/eclectic-byte-mark.png",
-	brandMarkType: "image/png",
+	brandMarkPath: "/brand/eclectic-byte-mark.svg",
+	brandMarkType: "image/svg+xml",
 	companyType: "Organization"
 } as const;
 
