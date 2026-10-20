@@ -54,7 +54,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
-		<link rel="icon" type="image/svg+xml" href={siteConfig.brandMarkPath} />
+		<link rel="icon" type={siteConfig.brandMarkType} href={siteConfig.brandMarkPath} />
 		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 		{sitemapHref && <link rel="sitemap" href={sitemapHref} />}
 		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
@@ -153,6 +153,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 				width: 2.75rem;
 				height: 2.75rem;
 				display: block;
+				object-fit: contain;
 			}
 
 			.brand-name {

@@ -9,13 +9,7 @@
   </defs>
   <rect width="1200" height="630" fill="url(#bg)" />
   <circle cx="150" cy="88" r="180" fill="#ef7d42" opacity="0.12" />
-  <g transform="translate(70 60) scale(.203125)">
-    <path fill="#ef7d42" fill-rule="evenodd" d="M224 48h136l104 104v80l-32 24 32 24v80L360 464H224V48Zm88 88v88h40l32-24v-40l-24-24h-48Zm0 152v88h48l24-24v-40l-32-24h-40Z" />
-    <path fill="#0f1720" d="M48 112 112 48h160v88H136v76h120v88H136v76h136v88H112l-64-64V112Z" />
-    <path fill="#ef7d42" d="M184 168h48v48h-48zM232 216h48v48h-48zM184 264h48v48h-48z" />
-    <path fill="#0f1720" d="M232 168h48v48h-48zM184 216h48v48h-48zM232 264h48v48h-48z" />
-  </g>
-  <text x="208" y="126" font-family="Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="4" fill="#0f1720">ECLECTIC BYTE</text>
+  <text x="70" y="126" font-family="Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="4" fill="#0f1720">ECLECTIC BYTE</text>
   <text x="70" y="252" font-family="Georgia, serif" font-size="98" fill="#0f1720">Focused software.</text>
   <text x="70" y="350" font-family="Georgia, serif" font-size="98" fill="#0f1720">Clear product surfaces.</text>
   <rect x="720" y="170" width="390" height="280" rx="34" fill="#ffffff" opacity="0.88" stroke="#e8dcc7" />
