@@ -1,0 +1,42 @@
+---
+interface Props {
+	text: string;
+	initialDelay?: number;
+	stagger?: number;
+}
+
+const { text, initialDelay = 400, stagger = 45 } = Astro.props;
+const words = text.trim().split(/\s+/).filter(Boolean);
+---
+
+{
+	words.map((word, index) => <Fragment><span class="blur-word" style={`--word-delay: ${initialDelay + index * stagger}ms`}>{word}</span>{index < words.length - 1 ? " " : ""}</Fragment>)
+}
+
+<style>
+	.blur-word {
+		display: inline-block;
+		animation: blur-in var(--blur-in-duration) ease-out both;
+		animation-delay: var(--word-delay, 0ms);
+	}
+
+	@keyframes blur-in {
+		0% {
+			opacity: 0;
+			transform: translateY(var(--blur-in-offset));
+			filter: blur(var(--blur-in-radius));
+		}
+
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+			filter: blur(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.blur-word {
+			animation: none;
+		}
+	}
+</style>

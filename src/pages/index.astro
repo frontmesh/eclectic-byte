@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import BlurInWords from "../components/BlurInWords.astro";
 import PostList from "../components/PostList.astro";
 import {
 	buildAbsoluteUrl,
@@ -57,7 +58,7 @@ const structuredData = websiteUrl
 	<section class="hero">
 		<div class="hero-copy">
 			<p class="eyebrow">Small software studio</p>
-			<h1>Eclectic Byte ships focused tools without the usual surface noise.</h1>
+			<h1><BlurInWords text="Eclectic Byte ships focused tools without the usual surface noise." /></h1>
 			<p class="hero-text">
 				A small collection of mobile products and commerce tools—built to do one thing well and
 				stay out of the way.

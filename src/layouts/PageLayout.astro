@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import BlurInWords from "../components/BlurInWords.astro";
 
 interface Props {
 	title: string;
@@ -11,10 +12,21 @@ interface Props {
 	meta?: { datetime: string; label: string };
 	ogType?: "website" | "article";
 	structuredData?: Record<string, unknown> | Record<string, unknown>[];
+	animateHeading?: boolean;
 }
 
-const { title, description, pathname, eyebrow, heading, intro, meta, ogType, structuredData } =
-	Astro.props;
+const {
+	title,
+	description,
+	pathname,
+	eyebrow,
+	heading,
+	intro,
+	meta,
+	ogType,
+	structuredData,
+	animateHeading = false
+} = Astro.props;
 ---
 
 <BaseLayout
@@ -28,7 +40,7 @@ const { title, description, pathname, eyebrow, heading, intro, meta, ogType, str
 		<header class="page-header">
 			<p class="eyebrow">{eyebrow}</p>
 			{meta && <p class="page-meta"><time datetime={meta.datetime}>{meta.label}</time></p>}
-			<h1>{heading}</h1>
+			<h1>{animateHeading ? <BlurInWords text={heading} /> : heading}</h1>
 			{intro && <p class="page-description">{intro}</p>}
 		</header>
 		<slot />
