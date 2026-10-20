@@ -9,7 +9,7 @@ export const siteConfig = {
 	locale: "en_US",
 	dateLocale: "en-US",
 	socialCardPath: "/social-card.svg",
-	brandMarkPath: "/favicon.svg",
+	brandMarkPath: "/brand/eclectic-byte-mark.svg",
 	companyType: "Organization"
 } as const;
 

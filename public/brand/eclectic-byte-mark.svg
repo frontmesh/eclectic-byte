@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Eclectic Byte brand mark</title>
+  <desc id="desc">An interlocking navy E and orange B assembled from precise geometric forms.</desc>
+  <path
+    fill="#EF7D42"
+    fill-rule="evenodd"
+    d="M224 48h136l104 104v80l-32 24 32 24v80L360 464H224V48Zm88 88v88h40l32-24v-40l-24-24h-48Zm0 152v88h48l24-24v-40l-32-24h-40Z"
+  />
+  <path
+    fill="#0F1720"
+    d="M48 112 112 48h160v88H136v76h120v88H136v76h136v88H112l-64-64V112Z"
+  />
+  <path fill="#EF7D42" d="M184 168h48v48h-48zM232 216h48v48h-48zM184 264h48v48h-48z" />
+  <path fill="#0F1720" d="M232 168h48v48h-48zM184 216h48v48h-48zM232 264h48v48h-48z" />
+</svg>

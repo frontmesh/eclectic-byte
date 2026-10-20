@@ -54,7 +54,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href={siteConfig.brandMarkPath} />
 		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 		{sitemapHref && <link rel="sitemap" href={sitemapHref} />}
 		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
@@ -152,14 +152,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 			.brand-mark {
 				width: 2.75rem;
 				height: 2.75rem;
-				border-radius: 1rem;
-				display: grid;
-				place-items: center;
-				font-weight: 700;
-				letter-spacing: 0.08em;
-				background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-deep) 100%);
-				color: white;
-				box-shadow: var(--shadow-soft);
+				display: block;
 			}
 
 			.brand-name {
@@ -269,7 +262,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 			<a class="skip-link" href="#main-content">Skip to content</a>
 			<header class="site-header">
 				<a class="brand-lockup" href="/">
-					<span class="brand-mark" aria-hidden="true">EB</span>
+					<img class="brand-mark" src={siteConfig.brandMarkPath} alt="" width="44" height="44" />
 					<span class="brand-name">Eclectic Byte</span>
 				</a>
 				<nav class="site-nav" aria-label="Primary">
