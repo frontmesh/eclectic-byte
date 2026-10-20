@@ -145,7 +145,6 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 			.brand-lockup {
 				display: inline-flex;
 				align-items: center;
-				gap: var(--space-3);
 				text-decoration: none;
 			}
 
@@ -154,13 +153,6 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 				height: 2.75rem;
 				display: block;
 				object-fit: contain;
-			}
-
-			.brand-name {
-				font-size: 0.95rem;
-				font-weight: 700;
-				letter-spacing: 0.08em;
-				text-transform: uppercase;
 			}
 
 			.site-nav {
@@ -262,9 +254,8 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 		<div class="page-shell">
 			<a class="skip-link" href="#main-content">Skip to content</a>
 			<header class="site-header">
-				<a class="brand-lockup" href="/">
+				<a class="brand-lockup" href="/" aria-label="Eclectic Byte home">
 					<img class="brand-mark" src={siteConfig.brandMarkPath} alt="" width="44" height="44" />
-					<span class="brand-name">Eclectic Byte</span>
 				</a>
 				<nav class="site-nav" aria-label="Primary">
 					<a href="/#projects">Projects</a>
