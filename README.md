@@ -4,7 +4,8 @@ Astro-based company site for Eclectic Byte.
 
 ## Structure
 
-- `src/`: site pages and layout
+- `src/`: site pages, layouts, components, and configuration
+- `src/content/blog/`: Markdown blog posts
 - `video-compressor/legal/`: source legal documents for the Video Compressor product
 - `eclectic-byte-logo-placeholder.svg`: repository-level placeholder logo asset
 
@@ -13,6 +14,10 @@ Astro-based company site for Eclectic Byte.
 - Canonical public legal source: `video-compressor/legal/`
 - Canonical support email for Video Compressor: `eclecticbyte@ymail.com`
 - Keep App Store Connect privacy answers, support metadata, and live legal pages aligned with these files before submission updates
+
+## Blog
+
+Posts live in `src/content/blog/` as Markdown files. Frontmatter requires `title`, `description`, and `publishedAt`; `author` and `draft` are optional. The blog index, post pages, homepage teaser, and sitemap entries are generated from that collection.
 
 ## Commands
 

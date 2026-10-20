@@ -1,0 +1,71 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import { formatPostDate } from "../../lib/format-date";
+import { buildAbsoluteUrl, siteConfig } from "../../site-config";
+
+export async function getStaticPaths() {
+	const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post }
+	}));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const publishedAt = post.data.publishedAt;
+const postUrl = buildAbsoluteUrl(`/blog/${post.id}`);
+const structuredData = postUrl
+	? [
+			{
+				"@context": "https://schema.org",
+				"@type": "BlogPosting",
+				headline: post.data.title,
+				description: post.data.description,
+				datePublished: publishedAt.toISOString(),
+				url: postUrl,
+				author: {
+					"@type": "Organization",
+					name: post.data.author
+				}
+			}
+		]
+	: [];
+---
+
+<BlogLayout
+	title={`${post.data.title} — ${siteConfig.siteName}`}
+	description={post.data.description}
+	pathname={`/blog/${post.id}`}
+	eyebrow="Blog"
+	heading={post.data.title}
+	intro={post.data.description}
+	meta={{ datetime: publishedAt.toISOString(), label: formatPostDate(publishedAt) }}
+	ogType="article"
+	structuredData={structuredData}
+>
+	<article class="legal-prose post-body">
+		<Content />
+	</article>
+	<footer class="post-footer">
+		<a href="/blog">← All posts</a>
+	</footer>
+</BlogLayout>
+
+<style>
+	.post-footer {
+		margin-top: var(--space-8);
+	}
+
+	.post-footer a {
+		color: var(--color-muted);
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.post-footer a:hover {
+		color: var(--color-ink);
+	}
+</style>

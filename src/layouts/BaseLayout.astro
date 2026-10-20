@@ -82,16 +82,28 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 				--color-border: rgba(15, 23, 32, 0.12);
 				--color-accent: #ef7d42;
 				--color-accent-deep: #bc4728;
+				--color-accent-soft: rgba(239, 125, 66, 0.12);
 				--color-shadow: rgba(15, 23, 32, 0.08);
+				--color-button-secondary: rgba(255, 255, 255, 0.58);
+				--color-card-panel: rgba(255, 255, 255, 0.82);
+				--color-featured-start: #17232e;
+				--color-featured-end: #0f1720;
+				--color-featured-mark: rgba(255, 255, 255, 0.14);
+				--color-featured-muted: rgba(255, 255, 255, 0.72);
+				--color-featured-border: rgba(255, 255, 255, 0.28);
+				--space-2: 0.5rem;
 				--space-3: 0.75rem;
 				--space-4: 1rem;
 				--space-6: 1.5rem;
 				--space-8: 2rem;
 				--space-12: 3rem;
 				--space-16: 4rem;
+				--radius-m: 1.1rem;
 				--radius-l: 2rem;
 				--shadow-soft: 0 24px 60px var(--color-shadow);
 				--content-width: 72rem;
+				--project-card-min-height: 26rem;
+				--transition-fast: 180ms ease;
 			}
 
 			* {
@@ -271,6 +283,8 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 					<span class="brand-name">Eclectic Byte</span>
 				</a>
 				<nav class="site-nav" aria-label="Primary">
+					<a href="/#projects">Projects</a>
+					<a href="/blog">Blog</a>
 					<a href="/#studio">Studio</a>
 					<a href="/#legal">Legal</a>
 				</nav>

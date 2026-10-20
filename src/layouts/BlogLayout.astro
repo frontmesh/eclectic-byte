@@ -1,0 +1,70 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+	title: string;
+	description: string;
+	pathname: string;
+	eyebrow: string;
+	heading: string;
+	intro?: string;
+	meta?: { datetime: string; label: string };
+	ogType?: "website" | "article";
+	structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { title, description, pathname, eyebrow, heading, intro, meta, ogType, structuredData } =
+	Astro.props;
+---
+
+<BaseLayout
+	title={title}
+	description={description}
+	pathname={pathname}
+	ogType={ogType}
+	structuredData={structuredData}
+>
+	<div class="blog-page">
+		<header class="blog-header">
+			<p class="eyebrow">{eyebrow}</p>
+			{meta && <p class="blog-meta"><time datetime={meta.datetime}>{meta.label}</time></p>}
+			<h1>{heading}</h1>
+			{intro && <p class="blog-intro">{intro}</p>}
+		</header>
+		<slot />
+	</div>
+</BaseLayout>
+
+<style>
+	.blog-page {
+		padding: var(--space-8) 0 var(--space-16);
+	}
+
+	.blog-header {
+		max-width: 46rem;
+		margin-bottom: var(--space-12);
+	}
+
+	.blog-header h1 {
+		margin: 0;
+		font-family: "Instrument Serif", serif;
+		font-size: clamp(3rem, 7vw, 5.5rem);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.04em;
+	}
+
+	.blog-meta {
+		margin: 0 0 var(--space-4);
+		color: var(--color-muted);
+		font-size: 0.95rem;
+	}
+
+	.blog-intro {
+		max-width: 38rem;
+		margin: var(--space-6) 0 0;
+		color: var(--color-muted);
+		font-size: 1.1rem;
+		line-height: 1.75;
+	}
+</style>

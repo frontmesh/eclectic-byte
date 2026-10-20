@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatPostDate } from "../lib/format-date";
+
+interface Props {
+	post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const publishedAt = post.data.publishedAt;
+const href = `/blog/${post.id}`;
+---
+
+<a class="post-card" href={href} aria-label={`Read ${post.data.title}`}>
+	<p class="post-date">
+		<time datetime={publishedAt.toISOString()}>{formatPostDate(publishedAt)}</time>
+	</p>
+	<h3>{post.data.title}</h3>
+	<p class="post-description">{post.data.description}</p>
+	<span class="post-more" aria-hidden="true">Read post →</span>
+</a>
+
+<style>
+	.post-card {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+		padding: var(--space-8);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+		text-decoration: none;
+		transition: transform var(--transition-fast);
+	}
+
+	.post-card:hover {
+		transform: translateY(-2px);
+	}
+
+	.post-date {
+		margin: 0;
+		color: var(--color-accent-deep);
+		font-size: 0.76rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.post-card h3 {
+		margin: 0;
+		font-family: "Instrument Serif", serif;
+		font-size: clamp(1.8rem, 3vw, 2.5rem);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.04em;
+	}
+
+	.post-description {
+		margin: 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.post-more {
+		margin-top: auto;
+		color: var(--color-ink);
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+</style>
