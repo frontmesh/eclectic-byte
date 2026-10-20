@@ -33,17 +33,17 @@ export const videoCompressorConfig = {
 
 export const legalLinks = [
 	{
-		href: "/video-compressor/legal/privacy-policy",
+		href: "/video-compressor/legal/privacy-policy/",
 		label: "Privacy Policy",
 		description: videoCompressorConfig.privacyDescription
 	},
 	{
-		href: "/video-compressor/legal/terms-of-service",
+		href: "/video-compressor/legal/terms-of-service/",
 		label: "Terms of Service",
 		description: videoCompressorConfig.termsDescription
 	},
 	{
-		href: "/video-compressor/legal/support",
+		href: "/video-compressor/legal/support/",
 		label: "Support",
 		description: videoCompressorConfig.supportDescription
 	}

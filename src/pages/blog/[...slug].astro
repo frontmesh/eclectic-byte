@@ -16,7 +16,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const publishedAt = post.data.publishedAt;
-const postUrl = buildAbsoluteUrl(`/blog/${post.id}`);
+const postUrl = buildAbsoluteUrl(`/blog/${post.id}/`);
 const structuredData = postUrl
 	? [
 			{
@@ -38,7 +38,7 @@ const structuredData = postUrl
 <BlogLayout
 	title={`${post.data.title} — ${siteConfig.siteName}`}
 	description={post.data.description}
-	pathname={`/blog/${post.id}`}
+	pathname={`/blog/${post.id}/`}
 	eyebrow="Blog"
 	heading={post.data.title}
 	intro={post.data.description}
@@ -50,7 +50,7 @@ const structuredData = postUrl
 		<Content />
 	</article>
 	<footer class="post-footer">
-		<a href="/blog">← All posts</a>
+		<a href="/blog/">← All posts</a>
 	</footer>
 </BlogLayout>
 

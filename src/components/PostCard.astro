@@ -8,7 +8,7 @@ interface Props {
 
 const { post } = Astro.props;
 const publishedAt = post.data.publishedAt;
-const href = `/blog/${post.id}`;
+const href = `/blog/${post.id}/`;
 ---
 
 <a class="post-card" href={href} aria-label={`Read ${post.data.title}`}>
