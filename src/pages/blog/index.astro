@@ -8,7 +8,7 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
 	(a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
 );
 const description =
-	"Notes from Eclectic Byte on focused software, product decisions, and the tools we build.";
+	"Posts from Eclectic Byte on focused software, product decisions, and the tools I build.";
 const blogUrl = buildAbsoluteUrl("/blog/");
 const structuredData = blogUrl
 	? [
@@ -34,7 +34,7 @@ const structuredData = blogUrl
 	description={description}
 	pathname="/blog/"
 	eyebrow="Blog"
-	heading="Notes from the studio."
+	heading="From the blog."
 	intro={description}
 	structuredData={structuredData}
 	animateHeading

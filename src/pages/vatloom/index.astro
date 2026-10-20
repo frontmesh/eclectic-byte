@@ -1,0 +1,894 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SampleReport from "../../components/SampleReport.astro";
+import { buildAbsoluteUrl, siteConfig, vatLoomConfig } from "../../site-config";
+
+const pageTitle = `${vatLoomConfig.productName} — EU OSS VAT reporting for Shopify`;
+const pageUrl = buildAbsoluteUrl(vatLoomConfig.path);
+const isLive = vatLoomConfig.status === "live";
+
+if (isLive && !vatLoomConfig.listingUrl) {
+	throw new Error("vatLoomConfig.listingUrl must be set before VatLoom can be marked live.");
+}
+
+const pageDescription = isLive
+	? `${vatLoomConfig.description} Start a ${vatLoomConfig.trialDays}-day free trial.`
+	: `${vatLoomConfig.description} Join the launch list for the Shopify app.`;
+const launchListEmailHref = `mailto:${siteConfig.founder.email}?subject=${encodeURIComponent(vatLoomConfig.launchListSubject)}&body=${encodeURIComponent("Hi Vladimir, please add me to the VatLoom launch list.")}`;
+const supportHref =
+	vatLoomConfig.supportUrl || `mailto:${siteConfig.founder.email}?subject=VatLoom%20support`;
+const supportLabel = vatLoomConfig.supportUrl ? "Read the support page" : "Email me";
+const canEmbedSignup = Boolean(vatLoomConfig.buttondownUsername && vatLoomConfig.privacyUrl);
+const buttondownAction = canEmbedSignup
+	? `https://buttondown.com/api/emails/embed-subscribe/${vatLoomConfig.buttondownUsername}`
+	: undefined;
+const priceFormatter = new Intl.NumberFormat("en-US", {
+	style: "currency",
+	currency: vatLoomConfig.currency
+});
+const monthlyPrice = priceFormatter.format(vatLoomConfig.priceMonthly);
+const annualPrice = priceFormatter.format(vatLoomConfig.priceAnnual);
+
+type CtaMode = "live" | "embedded" | "link" | "email";
+
+let ctaMode: CtaMode = "email";
+let primaryHref = launchListEmailHref;
+let primaryLabel = "Email me to join the launch list";
+let primaryExternal = false;
+
+if (isLive) {
+	ctaMode = "live";
+	primaryHref = vatLoomConfig.listingUrl;
+	primaryLabel = `Start your ${vatLoomConfig.trialDays}-day free trial`;
+	primaryExternal = true;
+} else if (canEmbedSignup) {
+	ctaMode = "embedded";
+	primaryHref = "#launch-list";
+	primaryLabel = "Join the launch list";
+} else if (vatLoomConfig.launchListUrl) {
+	ctaMode = "link";
+	primaryHref = vatLoomConfig.launchListUrl;
+	primaryLabel = "Join the launch list";
+	primaryExternal = true;
+}
+
+const statusLabel = isLive ? "Available on the Shopify App Store" : "In Shopify review";
+const statusCopy = isLive
+	? "Install VatLoom from the Shopify App Store and start your free trial."
+	: "Join the launch list and I'll send the install link when it's approved.";
+const launchHeading = isLive
+	? "Start your free trial."
+	: "Get the install link when VatLoom is approved.";
+const launchCopy = isLive
+	? "Install VatLoom from the Shopify App Store and start your free trial."
+	: "No spam. I'll email you when VatLoom is approved.";
+
+const faqs = [
+	{
+		question: "Does VatLoom file my OSS return?",
+		answer:
+			"No. VatLoom prepares reporting figures and working papers. You or your accountant file the return."
+	},
+	{
+		question: "What Shopify data does VatLoom read?",
+		answer:
+			"VatLoom requests read-only access to orders, tax lines, refunds, currencies, and destination countries. It does not change your Shopify data."
+	},
+	{
+		question: "How are refunds handled?",
+		answer:
+			"Same-quarter refunds reduce that quarter. Refunds from a later quarter appear as corrections to the original period instead of rewriting a quarter you already filed."
+	},
+	{
+		question: "Can I export the report?",
+		answer: "Yes. VatLoom exports the summary and working papers as CSV or XLSX files."
+	},
+	{
+		question: "What does VatLoom cost?",
+		answer: `VatLoom has a ${vatLoomConfig.trialDays}-day free trial, then costs ${monthlyPrice} per month or ${annualPrice} per year.`
+	},
+	{
+		question: "Is VatLoom tax advice?",
+		answer:
+			"No. VatLoom does not decide whether a sale belongs in OSS or replace professional tax advice."
+	}
+];
+
+const structuredData = pageUrl
+	? [
+			{
+				"@context": "https://schema.org",
+				"@type": "SoftwareApplication",
+				name: vatLoomConfig.productName,
+				applicationCategory: "BusinessApplication",
+				operatingSystem: "Shopify Admin",
+				description: vatLoomConfig.description,
+				url: pageUrl
+			},
+			{
+				"@context": "https://schema.org",
+				"@type": "FAQPage",
+				mainEntity: faqs.map((faq) => ({
+					"@type": "Question",
+					name: faq.question,
+					acceptedAnswer: {
+						"@type": "Answer",
+						text: faq.answer
+					}
+				}))
+			}
+		]
+	: [];
+---
+
+<BaseLayout
+	title={pageTitle}
+	description={pageDescription}
+	pathname={vatLoomConfig.path}
+	structuredData={structuredData}
+>
+	<section class="product-hero">
+		<div class="product-hero-copy">
+			<p class="eyebrow">VatLoom for Shopify</p>
+			<h1>{vatLoomConfig.tagline}</h1>
+			<p class="product-lede">
+				{vatLoomConfig.description} Review the figures before you file, or export the working
+				papers for your accountant.
+			</p>
+			<p class:list={["product-status", { "product-status-live": isLive }]}>{statusLabel}</p>
+			<p class="product-status-copy">{statusCopy}</p>
+			<div class="product-actions">
+				<a
+					class="button button-primary"
+					href={primaryHref}
+					target={primaryExternal ? "_blank" : undefined}
+					rel={primaryExternal ? "noopener noreferrer" : undefined}
+				>
+					{primaryLabel}
+				</a>
+				<a class="button button-secondary" href="#sample-report">See a sample report</a>
+			</div>
+			{ctaMode === "email" && <p class="product-cta-note">This opens your email app.</p>}
+		</div>
+		<div class="product-hero-report" id="sample-report">
+			<SampleReport />
+		</div>
+	</section>
+
+	<section class="product-section">
+		<div class="section-heading">
+			<p class="eyebrow">The problem</p>
+			<h2>Shopify has the orders. The OSS report is the missing piece.</h2>
+		</div>
+		<div class="problem-grid">
+			<div>
+				<p>
+					Your orders already contain the destination country, tax rate, refunds, and currency.
+					Shopify does not turn that into an OSS working paper. So the job becomes a spreadsheet:
+					export orders, split by country and rate, reconcile refunds, and track corrections.
+				</p>
+				<p>That work is repetitive, easy to get wrong, and hard to check later.</p>
+				<h3>What the spreadsheet has to answer</h3>
+				<ul class="problem-list">
+					<li>How much taxable revenue went to each country?</li>
+					<li>Which VAT rates apply, and what VAT is due at each rate?</li>
+					<li>Which refunds belong in this quarter, and which are corrections?</li>
+					<li>Which orders need a second look before the figures are final?</li>
+				</ul>
+			</div>
+			<aside class="problem-note">
+				<p class="problem-note-label">VatLoom removes the spreadsheet step.</p>
+				<p>
+					Select a period, review the OSS figures by country and rate, and export the working
+					papers if you need them.
+				</p>
+			</aside>
+		</div>
+	</section>
+
+	<section class="product-section">
+		<div class="section-heading">
+			<p class="eyebrow">How it works</p>
+			<h2>Three steps from Shopify orders to OSS working papers.</h2>
+		</div>
+		<ol class="steps">
+			<li class="step">
+				<span class="step-number">01</span>
+				<h3>Connect Shopify</h3>
+				<p>
+					Install VatLoom and grant read-only access to orders, tax lines, refunds, currencies,
+					and destination countries.
+				</p>
+			</li>
+			<li class="step">
+				<span class="step-number">02</span>
+				<h3>Choose the period</h3>
+				<p>
+					Pick the quarter, month, or custom date range and the Member State of dispatch. VatLoom
+					builds the OSS view for that period.
+				</p>
+			</li>
+			<li class="step">
+				<span class="step-number">03</span>
+				<h3>Review and export</h3>
+				<p>
+					Check country and rate totals, review any flagged orders, and export CSV or XLSX
+					working papers for your records or your accountant.
+				</p>
+			</li>
+		</ol>
+	</section>
+
+	<section class="product-section">
+		<div class="section-heading">
+			<p class="eyebrow">What you get</p>
+			<h2>An OSS report you can actually review.</h2>
+		</div>
+		<div class="feature-grid">
+			<article class="feature-card">
+				<h3>Country and rate totals</h3>
+				<p>
+					Taxable amounts, VAT, and gross revenue by destination country and exact VAT rate.
+				</p>
+			</article>
+			<article class="feature-card">
+				<h3>Refunds and corrections</h3>
+				<p>
+					Same-quarter refunds reduce the quarter. Later refunds appear as corrections to the
+					original period.
+				</p>
+			</article>
+			<article class="feature-card">
+				<h3>Review flags</h3>
+				<p>
+					Orders with incomplete tax lines, unresolved refunds, or other edge cases are flagged
+					before you rely on the totals.
+				</p>
+			</article>
+			<article class="feature-card">
+				<h3>CSV and XLSX exports</h3>
+				<p>
+					Export the summary and working papers for your records, your accountant, or your own
+					review.
+				</p>
+			</article>
+			<article class="feature-card">
+				<h3>Flexible periods</h3>
+				<p>
+					Run a quarter, a month, or a custom date range without rebuilding the spreadsheet.
+				</p>
+			</article>
+			<article class="feature-card">
+				<h3>Read-only Shopify access</h3>
+				<p>
+					VatLoom reads the order and tax data it needs. It does not change your Shopify data.
+				</p>
+			</article>
+		</div>
+	</section>
+
+	<section class="product-band">
+		<div>
+			<p class="eyebrow">Who it's for</p>
+			<h2>Shopify merchants who prepare their own EU OSS return.</h2>
+		</div>
+		<p>
+			If your accountant reviews the return, export the same working papers and send them over.
+			VatLoom is built for the review step either way. It does not file the return, decide OSS
+			eligibility, or replace professional tax advice.
+		</p>
+	</section>
+
+	<section class="product-section" id="pricing">
+		<div class="pricing-card">
+			<div>
+				<p class="eyebrow">Pricing</p>
+				<h2>Start with a {vatLoomConfig.trialDays}-day free trial.</h2>
+				<p class="pricing-copy">
+					Then choose monthly or annual billing. Prices are in {vatLoomConfig.currency}.
+				</p>
+				<div class="price-options">
+					<div class="price-option">
+						<span class="price-amount">{monthlyPrice}</span>
+						<span class="price-period">per month</span>
+					</div>
+					<div class="price-option">
+						<span class="price-amount">{annualPrice}</span>
+						<span class="price-period">per year</span>
+					</div>
+				</div>
+			</div>
+			<div class="pricing-actions">
+				<a
+					class="button button-primary"
+					href={primaryHref}
+					target={primaryExternal ? "_blank" : undefined}
+					rel={primaryExternal ? "noopener noreferrer" : undefined}
+				>
+					{primaryLabel}
+				</a>
+				<p class="pricing-note">{statusCopy}</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="product-section">
+		<div class="section-heading">
+			<p class="eyebrow">FAQ</p>
+			<h2>Questions before you start.</h2>
+		</div>
+		<div class="faq-list">
+			{
+				faqs.map((faq) => (
+					<details class="faq-item">
+						<summary>{faq.question}</summary>
+						<p>{faq.answer}</p>
+					</details>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="product-section" id="launch-list">
+		<div class="launch-card">
+			<p class="eyebrow">{isLive ? "Get started" : "Launch list"}</p>
+			<h2>{launchHeading}</h2>
+			<p class="launch-copy">{launchCopy}</p>
+
+			{
+				ctaMode === "embedded" && (
+					<form
+						class="launch-form"
+						action={buttondownAction}
+						method="post"
+						target="_blank"
+					>
+						<label for="launch-email">Email address</label>
+						<input type="hidden" name="embed" value="1" />
+						<div class="launch-form-row">
+							<input
+								id="launch-email"
+								type="email"
+								name="email"
+								autocomplete="email"
+								placeholder="you@example.com"
+								required
+							/>
+							<button class="button button-primary" type="submit">
+								Join the launch list
+							</button>
+						</div>
+						<p class="launch-consent">
+							By joining, you agree to receive launch updates about VatLoom. Unsubscribe
+							anytime.{" "}
+							<a
+								href={vatLoomConfig.privacyUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Privacy policy
+							</a>.
+						</p>
+					</form>
+				)
+			}
+
+			{
+				ctaMode !== "embedded" && (
+					<div class="launch-actions">
+						<a
+							class="button button-primary"
+							href={primaryHref}
+							target={primaryExternal ? "_blank" : undefined}
+							rel={primaryExternal ? "noopener noreferrer" : undefined}
+						>
+							{primaryLabel}
+						</a>
+						{ctaMode === "email" && (
+							<p class="launch-note">This opens your email app.</p>
+						)}
+					</div>
+				)
+			}
+
+			<p class="product-support">
+				Questions? <a href={supportHref}>{supportLabel}</a>.
+				{
+					vatLoomConfig.privacyUrl && (
+						<>
+							{" "}
+							<a href={vatLoomConfig.privacyUrl}>Privacy policy</a>.
+						</>
+					)
+				}
+			</p>
+		</div>
+	</section>
+
+	<p class="product-disclaimer">
+		VatLoom prepares reporting figures and working papers. It does not file or submit the OSS
+		return, and it is not tax advice.
+	</p>
+</BaseLayout>
+
+<style>
+	.product-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);
+		gap: var(--space-8);
+		align-items: center;
+		padding: var(--space-8) 0 var(--space-16);
+	}
+
+	.product-hero-copy,
+	.product-hero-report,
+	.problem-grid > *,
+	.steps > *,
+	.feature-grid > *,
+	.pricing-card > * {
+		min-width: 0;
+	}
+
+	.product-hero h1,
+	.section-heading h2,
+	.product-band h2,
+	.pricing-card h2,
+	.launch-card h2,
+	.step h3 {
+		font-family: "Instrument Serif", serif;
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.04em;
+		margin: 0;
+	}
+
+	.product-hero h1 {
+		max-width: 13ch;
+		font-size: clamp(3rem, 7vw, 6rem);
+	}
+
+	.product-lede {
+		max-width: 38rem;
+		margin: var(--space-6) 0 0;
+		color: var(--color-muted);
+		font-size: 1.15rem;
+		line-height: 1.75;
+	}
+
+	.product-status {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		margin: var(--space-6) 0 0;
+		padding: 0.35rem 0.7rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		color: var(--color-accent-deep);
+		font-size: 0.76rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.product-status::before {
+		content: "";
+		width: var(--space-2);
+		height: var(--space-2);
+		border-radius: 999px;
+		background: var(--color-accent);
+	}
+
+	.product-status-live {
+		color: var(--color-ink);
+	}
+
+	.product-status-copy {
+		max-width: 34rem;
+		margin: var(--space-3) 0 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.product-actions {
+		display: flex;
+		gap: var(--space-4);
+		flex-wrap: wrap;
+		margin-top: var(--space-8);
+	}
+
+	.product-cta-note {
+		margin: var(--space-3) 0 0;
+		color: var(--color-muted);
+		font-size: 0.85rem;
+	}
+
+	.product-hero-report {
+		scroll-margin-top: var(--space-8);
+	}
+
+	.product-section {
+		padding: 0 0 var(--space-16);
+	}
+
+	.section-heading {
+		margin-bottom: var(--space-8);
+	}
+
+	.section-heading h2 {
+		max-width: 18ch;
+		font-size: clamp(2.5rem, 5vw, 4rem);
+	}
+
+	.problem-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+		gap: var(--space-8);
+		align-items: start;
+	}
+
+	.problem-grid p,
+	.problem-list {
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.problem-grid > div > p {
+		max-width: 44rem;
+		margin: 0 0 var(--space-4);
+	}
+
+	.problem-grid h3 {
+		margin: var(--space-6) 0 var(--space-3);
+		font-size: 1.05rem;
+	}
+
+	.problem-list {
+		display: grid;
+		gap: var(--space-2);
+		max-width: 44rem;
+		margin: 0;
+		padding-left: 1.2rem;
+	}
+
+	.problem-note {
+		padding: var(--space-6);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.problem-note p {
+		margin: 0;
+	}
+
+	.problem-note p + p {
+		margin-top: var(--space-4);
+	}
+
+	.problem-note-label {
+		color: var(--color-ink);
+		font-weight: 700;
+	}
+
+	.steps {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--space-4);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.step {
+		padding: var(--space-6);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+	}
+
+	.step-number {
+		display: block;
+		margin-bottom: var(--space-4);
+		color: var(--color-accent-deep);
+		font-size: 0.76rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+	}
+
+	.step h3 {
+		margin-bottom: var(--space-3);
+		font-size: 1.9rem;
+	}
+
+	.step p {
+		margin: 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.feature-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--space-4);
+	}
+
+	.feature-card {
+		padding: var(--space-6);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+	}
+
+	.feature-card h3 {
+		margin: 0 0 var(--space-2);
+		font-size: 1.05rem;
+	}
+
+	.feature-card p {
+		margin: 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.product-band {
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 1.1fr);
+		gap: var(--space-8);
+		align-items: end;
+		margin-bottom: var(--space-16);
+		padding: var(--space-8);
+		background: linear-gradient(145deg, var(--color-featured-start), var(--color-featured-end));
+		border-radius: var(--radius-l);
+		color: var(--color-on-dark);
+	}
+
+	.product-band .eyebrow {
+		color: var(--color-accent);
+	}
+
+	.product-band h2 {
+		font-size: clamp(2.25rem, 4vw, 3.5rem);
+	}
+
+	.product-band p:last-child {
+		margin: 0;
+		color: var(--color-featured-muted);
+		line-height: 1.7;
+	}
+
+	.pricing-card {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--space-8);
+		align-items: end;
+		padding: var(--space-8);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.pricing-card h2 {
+		max-width: 16ch;
+		font-size: clamp(2.25rem, 4vw, 3.5rem);
+	}
+
+	.pricing-copy {
+		max-width: 34rem;
+		margin: var(--space-4) 0 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.price-options {
+		display: flex;
+		gap: var(--space-6);
+		flex-wrap: wrap;
+		margin-top: var(--space-6);
+	}
+
+	.price-option {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.price-amount {
+		font-family: "Instrument Serif", serif;
+		font-size: 2.25rem;
+		line-height: 1;
+	}
+
+	.price-period {
+		color: var(--color-muted);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.pricing-actions {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-4);
+		max-width: 22rem;
+	}
+
+	.pricing-note {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		line-height: 1.6;
+	}
+
+	.faq-list {
+		display: grid;
+		max-width: 54rem;
+	}
+
+	.faq-item {
+		padding: var(--space-4) 0;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.faq-item summary {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--space-4);
+		cursor: pointer;
+		font-weight: 700;
+		list-style: none;
+	}
+
+	.faq-item summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.faq-item summary::after {
+		content: "+";
+		color: var(--color-accent-deep);
+		font-size: 1.25rem;
+		line-height: 1;
+	}
+
+	.faq-item[open] summary::after {
+		content: "−";
+	}
+
+	.faq-item p {
+		max-width: 46rem;
+		margin: var(--space-3) 0 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.launch-card {
+		padding: var(--space-8);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.launch-card h2 {
+		max-width: 18ch;
+		font-size: clamp(2.25rem, 4vw, 3.5rem);
+	}
+
+	.launch-copy {
+		max-width: 44rem;
+		margin: var(--space-4) 0 0;
+		color: var(--color-muted);
+		line-height: 1.7;
+	}
+
+	.launch-form {
+		max-width: 40rem;
+		margin-top: var(--space-6);
+	}
+
+	.launch-form label {
+		display: block;
+		margin-bottom: var(--space-2);
+		font-weight: 700;
+	}
+
+	.launch-form-row {
+		display: flex;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
+	.launch-form input {
+		flex: 1 1 16rem;
+		min-width: 0;
+		padding: 0.85rem 1rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: var(--color-on-dark);
+		color: var(--color-ink);
+		font: inherit;
+	}
+
+	.launch-form input:focus {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+
+	.launch-consent {
+		margin: var(--space-3) 0 0;
+		color: var(--color-muted);
+		font-size: 0.8rem;
+		line-height: 1.6;
+	}
+
+	.launch-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		flex-wrap: wrap;
+		margin-top: var(--space-6);
+	}
+
+	.launch-note {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.85rem;
+	}
+
+	.product-support {
+		margin: var(--space-6) 0 0;
+		color: var(--color-muted);
+		font-size: 0.9rem;
+	}
+
+	.product-disclaimer {
+		max-width: 54rem;
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		line-height: 1.6;
+	}
+
+	@media (max-width: 1080px) {
+		.feature-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 920px) {
+		.product-hero,
+		.problem-grid,
+		.product-band,
+		.pricing-card {
+			grid-template-columns: 1fr;
+		}
+
+		.steps {
+			grid-template-columns: 1fr;
+		}
+
+		.product-band {
+			align-items: start;
+		}
+
+		.pricing-actions {
+			max-width: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.product-hero h1,
+		.section-heading h2,
+		.pricing-card h2,
+		.launch-card h2 {
+			max-width: none;
+		}
+
+		.feature-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -2,17 +2,60 @@ const siteUrlValue = import.meta.env.SITE_URL ?? import.meta.env.PUBLIC_SITE_URL
 
 export const siteConfig = {
 	siteName: "Eclectic Byte",
-	siteTagline: "Eclectic Byte builds focused software with clear, durable product surfaces.",
+	siteTagline: "Small software for specific problems.",
 	siteDescription:
-		"Eclectic Byte is a small software studio building focused mobile apps and commerce products.",
+		"Vladimir Vujosevic builds VatLoom, Habitoro, and small iOS utilities, plus private commerce integrations for Shopify stores.",
 	siteUrl: siteUrlValue,
 	locale: "en_US",
 	dateLocale: "en-US",
 	socialCardPath: "/social-card.svg",
 	brandMarkPath: "/brand/eclectic-byte-mark.svg",
 	brandMarkType: "image/svg+xml",
-	companyType: "Organization"
+	companyType: "Organization",
+	founder: {
+		name: "Vladimir Vujosevic",
+		email: "eclecticbyte@proton.me"
+	}
 } as const;
+
+type VatLoomStatus = "review" | "live";
+
+interface VatLoomConfig {
+	productName: string;
+	path: string;
+	status: VatLoomStatus;
+	listingUrl: string;
+	launchListUrl: string;
+	buttondownUsername: string;
+	privacyUrl: string;
+	supportUrl: string;
+	trialDays: number;
+	priceMonthly: number;
+	priceAnnual: number;
+	currency: string;
+	tagline: string;
+	description: string;
+	launchListSubject: string;
+}
+
+export const vatLoomConfig: VatLoomConfig = {
+	productName: "VatLoom",
+	path: "/vatloom/",
+	status: "review",
+	listingUrl: "",
+	launchListUrl: "",
+	buttondownUsername: "",
+	privacyUrl: "",
+	supportUrl: "",
+	trialDays: 14,
+	priceMonthly: 4.99,
+	priceAnnual: 39.99,
+	currency: "USD",
+	tagline: "EU OSS VAT reports from Shopify, without the spreadsheet.",
+	description:
+		"VatLoom organizes Shopify orders and refunds into country-and-rate OSS summaries and exportable working papers.",
+	launchListSubject: "VatLoom launch list"
+};
 
 export const habitoroConfig = {
 	productName: "Habitoro",
@@ -25,7 +68,7 @@ export const habitoroConfig = {
 export const videoCompressorConfig = {
 	productName: "Video Compressor",
 	heroDescription:
-		"A straightforward product surface for compressing and exporting video with less friction and clearer defaults.",
+		"A small iOS utility for compressing and exporting video with less friction and clearer defaults.",
 	privacyDescription: "How Video Compressor handles local processing, subscriptions, and support.",
 	termsDescription: "The operational terms covering subscriptions, acceptable use, and support.",
 	supportEmail: "eclecticbyte@ymail.com",
@@ -63,18 +106,33 @@ interface Project {
 	description: string;
 	tags: readonly string[];
 	availability: string;
+	featured?: boolean;
 	link?: ProjectLink;
 }
 
 export const projects: readonly Project[] = [
 	{
+		name: vatLoomConfig.productName,
+		mark: "VL",
+		category: "EU OSS VAT for Shopify",
+		description:
+			"Organizes Shopify orders and refunds into country-and-rate OSS summaries and exportable working papers.",
+		tags: ["Shopify", "EU OSS", "Reporting"],
+		availability: vatLoomConfig.status === "live" ? "Live" : "In Shopify review",
+		featured: true,
+		link: {
+			href: vatLoomConfig.path,
+			label: "See VatLoom",
+			external: false
+		}
+	},
+	{
 		name: habitoroConfig.productName,
 		mark: "HA",
 		category: "Habit and focus app",
-		description:
-			"Build habits, run focus sessions, and see your progress in a motivating iOS experience designed without clutter.",
+		description: "Build habits, run focus sessions, and see steady progress in a calm iOS app.",
 		tags: ["iOS", "Habits", "Focus"],
-		availability: "Available now",
+		availability: "Live",
 		link: {
 			href: habitoroConfig.websiteUrl,
 			label: "Visit Habitoro",
@@ -82,34 +140,24 @@ export const projects: readonly Project[] = [
 		}
 	},
 	{
-		name: "VatLoom",
-		mark: "VL",
-		category: "Shopify VAT reporting",
+		name: "Shopify × bol.com",
+		mark: "SB",
+		category: "Client commerce integration",
 		description:
-			"Turns Shopify order and refund data into reviewable EU OSS VAT reports, corrections, and export-ready working papers.",
-		tags: ["Shopify", "EU OSS", "Reporting"],
-		availability: "Private pilot"
-	},
-	{
-		name: "Bol Connect",
-		mark: "BC",
-		category: "Commerce integration",
-		description:
-			"Connects Shopify and bol.com operations across product matching, inventory, orders, fulfillment, and returns.",
+			"A private integration covering product matching, inventory, orders, fulfillment, and returns.",
 		tags: ["Shopify", "bol.com", "Sync"],
-		availability: "Client rollout"
+		availability: "Client work"
 	},
 	{
 		name: videoCompressorConfig.productName,
 		mark: "VC",
 		category: "Mobile utility",
-		description:
-			"A focused iOS utility for compressing and exporting video with less friction and clearer defaults.",
+		description: "Compresses and exports video on iOS with fewer steps and clearer defaults.",
 		tags: ["iOS", "Media", "Local-first"],
-		availability: "Live app",
+		availability: "Live",
 		link: {
 			href: "/legal/",
-			label: "View legal resources",
+			label: "Support & legal",
 			external: false
 		}
 	}

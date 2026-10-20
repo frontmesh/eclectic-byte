@@ -1,0 +1,232 @@
+---
+const rows = [
+	{ country: "Germany", rate: "19%", taxable: "12,480.00", vat: "2,371.20", gross: "14,851.20" },
+	{ country: "France", rate: "20%", taxable: "8,920.00", vat: "1,784.00", gross: "10,704.00" },
+	{ country: "Netherlands", rate: "21%", taxable: "6,340.00", vat: "1,331.40", gross: "7,671.40" },
+	{ country: "Spain", rate: "21%", taxable: "4,780.00", vat: "1,003.80", gross: "5,783.80" },
+	{ country: "Ireland", rate: "23%", taxable: "2,150.00", vat: "494.50", gross: "2,644.50" }
+];
+
+const totals = {
+	taxable: "34,670.00",
+	vat: "6,984.90",
+	gross: "41,654.90"
+};
+---
+
+<div class="sample-report">
+	<div class="sample-report-header">
+		<div>
+			<p class="sample-report-kicker">Sample OSS report</p>
+			<p class="sample-report-period">Q3 2026 · EUR</p>
+		</div>
+		<p class="sample-report-note">Illustrative figures</p>
+	</div>
+	<div class="table-scroll">
+		<table>
+			<caption class="sr-only">Sample EU OSS summary by destination country</caption>
+			<thead>
+				<tr>
+					<th scope="col">Country / rate</th>
+					<th scope="col">Taxable</th>
+					<th scope="col">VAT</th>
+					<th scope="col">Gross</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					rows.map((row) => (
+						<tr>
+							<th scope="row">
+								<span class="sample-report-country">{row.country}</span>
+								<span class="sample-report-rate">{row.rate}</span>
+							</th>
+							<td>{row.taxable}</td>
+							<td>{row.vat}</td>
+							<td>{row.gross}</td>
+						</tr>
+					))
+				}
+			</tbody>
+			<tfoot>
+				<tr>
+					<th scope="row">Total</th>
+					<td>{totals.taxable}</td>
+					<td>{totals.vat}</td>
+					<td>{totals.gross}</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+	<div class="sample-report-footer">
+		<span>Same-quarter refunds applied</span>
+		<span>2 review flags</span>
+	</div>
+</div>
+
+<style>
+	.sample-report {
+		min-width: 0;
+		padding: var(--space-6);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.sample-report-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--space-4);
+		margin-bottom: var(--space-4);
+	}
+
+	.sample-report-kicker {
+		margin: 0;
+		color: var(--color-accent-deep);
+		font-size: 0.76rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.sample-report-period {
+		margin: var(--space-2) 0 0;
+		color: var(--color-ink);
+		font-size: 1.05rem;
+		font-weight: 700;
+	}
+
+	.sample-report-note {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.8rem;
+		text-align: right;
+	}
+
+	.table-scroll {
+		overflow-x: auto;
+	}
+
+	table {
+		width: 100%;
+		font-size: 0.8rem;
+		border-collapse: collapse;
+	}
+
+	th,
+	td {
+		padding: 0.65rem 0.3rem;
+		border-bottom: 1px solid var(--color-border);
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	thead th {
+		color: var(--color-muted);
+		font-size: 0.64rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	thead th:first-child,
+	tbody th,
+	tfoot th {
+		text-align: left;
+	}
+
+	tbody th,
+	tfoot th {
+		font-weight: 700;
+	}
+
+	.sample-report-country {
+		display: block;
+	}
+
+	.sample-report-rate {
+		display: block;
+		margin-top: 0.15rem;
+		color: var(--color-muted);
+		font-size: 0.72rem;
+		font-weight: 500;
+	}
+
+	tbody td {
+		color: var(--color-muted);
+	}
+
+	tfoot th,
+	tfoot td {
+		border-bottom: 0;
+		color: var(--color-ink);
+		font-weight: 700;
+	}
+
+	.sample-report-footer {
+		display: flex;
+		gap: var(--space-4);
+		flex-wrap: wrap;
+		margin-top: var(--space-4);
+		color: var(--color-muted);
+		font-size: 0.78rem;
+	}
+
+	@media (max-width: 390px) {
+		table {
+			font-size: 0.72rem;
+		}
+
+		th,
+		td {
+			padding: 0.55rem 0.25rem;
+		}
+
+		thead th {
+			font-size: 0.6rem;
+		}
+
+		.sample-report-rate {
+			font-size: 0.66rem;
+		}
+	}
+
+	@media (max-width: 360px) {
+		.sample-report {
+			padding: var(--space-4);
+		}
+
+		table {
+			font-size: 0.68rem;
+		}
+
+		th,
+		td {
+			padding: 0.5rem 0.2rem;
+		}
+
+		thead th {
+			font-size: 0.56rem;
+			letter-spacing: 0.02em;
+		}
+
+		.sample-report-rate {
+			font-size: 0.64rem;
+		}
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+</style>

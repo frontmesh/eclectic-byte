@@ -8,12 +8,23 @@ import {
 	habitoroConfig,
 	projects,
 	siteConfig,
+	vatLoomConfig,
 	videoCompressorConfig
 } from "../site-config";
 
-const pageTitle = siteConfig.siteName;
+const pageTitle = `${siteConfig.siteName} — small software for specific problems`;
 const pageDescription = siteConfig.siteDescription;
 const websiteUrl = buildAbsoluteUrl("/");
+const isVatLoomLive = vatLoomConfig.status === "live";
+const vatLoomStatusLabel = isVatLoomLive ? "Available now" : "In Shopify review";
+const vatLoomPanelExternal = isVatLoomLive && Boolean(vatLoomConfig.listingUrl);
+let vatLoomPanelHref = `${vatLoomConfig.path}#launch-list`;
+let vatLoomPanelLabel = "Join the launch list";
+
+if (vatLoomPanelExternal) {
+	vatLoomPanelHref = vatLoomConfig.listingUrl;
+	vatLoomPanelLabel = "Start free trial";
+}
 const blogPosts = (await getCollection("blog", ({ data }) => !data.draft))
 	.sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
 	.slice(0, 3);
@@ -25,6 +36,15 @@ const structuredData = websiteUrl
 				name: siteConfig.siteName,
 				url: websiteUrl,
 				description: siteConfig.siteDescription
+			},
+			{
+				"@context": "https://schema.org",
+				"@type": "SoftwareApplication",
+				name: vatLoomConfig.productName,
+				applicationCategory: "BusinessApplication",
+				operatingSystem: "Shopify Admin",
+				description: vatLoomConfig.description,
+				url: buildAbsoluteUrl(vatLoomConfig.path)
 			},
 			{
 				"@context": "https://schema.org",
@@ -41,7 +61,7 @@ const structuredData = websiteUrl
 				"@type": "SoftwareApplication",
 				name: videoCompressorConfig.productName,
 				applicationCategory: "MultimediaApplication",
-				operatingSystem: "Unspecified",
+				operatingSystem: "iOS",
 				description: videoCompressorConfig.heroDescription,
 				url: websiteUrl
 			}
@@ -57,33 +77,42 @@ const structuredData = websiteUrl
 >
 	<section class="hero">
 		<div class="hero-copy">
-			<p class="eyebrow">Small software studio</p>
-			<h1><BlurInWords text="Eclectic Byte ships focused tools without the usual surface noise." /></h1>
+			<p class="eyebrow">Independent software studio</p>
+			<h1><BlurInWords text="I build focused software. VatLoom is what I'm working on now." /></h1>
 			<p class="hero-text">
-				A small collection of mobile products and commerce tools—built to do one thing well and
-				stay out of the way.
+				I'm Vladimir Vujosevic, founder of Eclectic Byte. VatLoom organizes Shopify orders and
+				refunds into country-and-rate OSS summaries and exportable working papers.
 			</p>
 			<div class="hero-actions">
-				<a class="button button-primary" href="#projects">Explore projects</a>
-				<a class="button button-secondary" href="/blog/">Read the blog</a>
+				<a class="button button-primary" href={vatLoomConfig.path}>See VatLoom</a>
+				<a class="button button-secondary" href="#projects">See all projects</a>
 			</div>
 		</div>
-		<aside class="hero-panel" aria-labelledby="featured-product-title">
-			<div class="panel-chip">Featured product</div>
-			<h2 id="featured-product-title">{habitoroConfig.productName}</h2>
-			<p>{habitoroConfig.heroDescription}</p>
+		<aside class="hero-panel" aria-labelledby="current-product-title">
+			<div class="panel-chip">Currently</div>
+			<h2 id="current-product-title">{vatLoomConfig.productName}</h2>
+			<p class="panel-status">{vatLoomStatusLabel}</p>
+			<p>{vatLoomConfig.description}</p>
+			<a
+				class="panel-link"
+				href={vatLoomPanelHref}
+				target={vatLoomPanelExternal ? "_blank" : undefined}
+				rel={vatLoomPanelExternal ? "noopener noreferrer" : undefined}
+			>
+				{vatLoomPanelLabel} <span aria-hidden="true">→</span>
+			</a>
 		</aside>
 	</section>
 
 	<section class="section projects-section" id="projects">
 		<div class="section-heading projects-heading">
 			<div>
-				<p class="eyebrow">Selected projects</p>
-				<h2>Useful software, built with a point of view.</h2>
+				<p class="eyebrow">Projects</p>
+				<h2>Different problems. Same standard.</h2>
 			</div>
 			<p class="section-intro">
-				From habit tracking to Shopify operations, each project starts with a narrow problem and a
-				preference for clear, durable solutions.
+				A small portfolio of products and client work. Each starts with a narrow problem and stops
+				when the problem is solved.
 			</p>
 		</div>
 		<div class="projects-grid">
@@ -91,7 +120,7 @@ const structuredData = websiteUrl
 				projects.map((project, index) => {
 					const { link } = project;
 					return (
-						<article class:list={["project-card", { "project-card-featured": index === 0 }]}>
+						<article class:list={["project-card", { "project-card-featured": project.featured }]}>
 							<div class="project-card-topline">
 								<span class="project-mark" aria-hidden="true">{project.mark}</span>
 								<span class="project-number">{String(index + 1).padStart(2, "0")}</span>
@@ -127,13 +156,25 @@ const structuredData = websiteUrl
 		</div>
 	</section>
 
+	<section class="founder-section" aria-labelledby="founder-title">
+		<div class="founder-copy">
+			<p class="eyebrow">Built by one person</p>
+			<h2 id="founder-title">I'm Vladimir. I build and run these tools.</h2>
+			<p>
+				I start with a narrow problem, keep the scope small, and ship when it does one job
+				properly. If you're working on EU OSS reporting or a Shopify integration, email me.
+			</p>
+		</div>
+		<a class="button button-secondary" href={`mailto:${siteConfig.founder.email}`}>Email me</a>
+	</section>
+
 	{
 		blogPosts.length > 0 && (
 			<section class="section" id="blog">
 				<div class="section-heading blog-section-heading">
 					<div>
 						<p class="eyebrow">Blog</p>
-						<h2>Notes from the studio.</h2>
+						<h2>From the blog.</h2>
 					</div>
 					<a class="section-link" href="/blog/">
 						All posts <span aria-hidden="true">→</span>
@@ -157,7 +198,8 @@ const structuredData = websiteUrl
 	.hero-copy h1,
 	.section-heading h2,
 	.project-card h3,
-	.hero-panel h2 {
+	.hero-panel h2,
+	.founder-copy h2 {
 		font-family: "Instrument Serif", serif;
 		font-weight: 400;
 		line-height: 0.95;
@@ -166,8 +208,8 @@ const structuredData = websiteUrl
 	}
 
 	.hero-copy h1 {
-		font-size: clamp(3.5rem, 9vw, 7rem);
-		max-width: 11ch;
+		font-size: clamp(3.25rem, 8vw, 6.5rem);
+		max-width: 18ch;
 	}
 
 	.hero-text {
@@ -185,52 +227,28 @@ const structuredData = websiteUrl
 		margin-top: var(--space-8);
 	}
 
-	.button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		text-decoration: none;
-		border-radius: 999px;
-		padding: 0.9rem 1.25rem;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-	}
-
-	.button-primary {
-		background: var(--color-ink);
-		color: white;
-	}
-
-	.button-secondary {
-		background: var(--color-button-secondary);
-		border: 1px solid var(--color-border);
-	}
-
-	.button,
 	.project-link,
-	.section-link {
+	.section-link,
+	.panel-link {
 		transition:
 			transform var(--transition-fast),
 			background-color var(--transition-fast),
 			color var(--transition-fast);
 	}
 
-	.button:hover,
 	.project-link:hover,
-	.section-link:hover {
+	.section-link:hover,
+	.panel-link:hover {
 		transform: translateY(-2px);
 	}
 
 	.hero-panel {
+		padding: clamp(1.5rem, 2vw, 2rem);
 		background: var(--color-panel);
 		backdrop-filter: blur(14px);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-l);
 		box-shadow: var(--shadow-soft);
-	}
-
-	.hero-panel {
-		padding: clamp(1.5rem, 2vw, 2rem);
 	}
 
 	.panel-chip {
@@ -253,6 +271,26 @@ const structuredData = websiteUrl
 	.hero-panel p {
 		color: var(--color-muted);
 		line-height: 1.7;
+	}
+
+	.hero-panel .panel-status {
+		margin: var(--space-2) 0 0;
+		color: var(--color-accent-deep);
+		font-size: 0.76rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.panel-link {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		margin-top: var(--space-6);
+		color: var(--color-ink);
+		font-size: 0.9rem;
+		font-weight: 700;
+		text-decoration: none;
 	}
 
 	.section {
@@ -308,7 +346,7 @@ const structuredData = websiteUrl
 	.project-card-featured {
 		background:
 			linear-gradient(145deg, var(--color-featured-start), var(--color-featured-end));
-		color: white;
+		color: var(--color-on-dark);
 	}
 
 	.project-card-topline,
@@ -333,7 +371,7 @@ const structuredData = websiteUrl
 
 	.project-card-featured .project-mark {
 		background: var(--color-featured-mark);
-		color: white;
+		color: var(--color-on-dark);
 	}
 
 	.project-number,
@@ -401,7 +439,7 @@ const structuredData = websiteUrl
 	}
 
 	.project-card-featured .project-link {
-		color: white;
+		color: var(--color-on-dark);
 	}
 
 	.project-status {
@@ -427,6 +465,37 @@ const structuredData = websiteUrl
 		flex-direction: column;
 		align-items: flex-end;
 		gap: var(--space-2);
+	}
+
+	.founder-section {
+		display: flex;
+		align-items: end;
+		justify-content: space-between;
+		gap: var(--space-8);
+		flex-wrap: wrap;
+		margin-bottom: var(--space-16);
+		padding: var(--space-8);
+		background: var(--color-card-panel);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-l);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.founder-copy {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.founder-copy h2 {
+		max-width: 18ch;
+		font-size: clamp(2rem, 4vw, 3.5rem);
+	}
+
+	.founder-copy p:last-child {
+		max-width: 44rem;
+		margin: var(--space-4) 0 0;
+		color: var(--color-muted);
+		line-height: 1.7;
 	}
 
 	.blog-section-heading {
@@ -458,6 +527,11 @@ const structuredData = websiteUrl
 
 		.project-action {
 			align-items: flex-start;
+		}
+
+		.founder-section {
+			align-items: flex-start;
+			flex-direction: column;
 		}
 	}
 </style>

@@ -1,5 +1,5 @@
 ---
-import { buildAbsoluteUrl, siteConfig } from "../site-config";
+import { buildAbsoluteUrl, habitoroConfig, siteConfig, vatLoomConfig } from "../site-config";
 
 interface Props {
 	title: string;
@@ -31,7 +31,12 @@ const organizationSchema = canonicalUrl
 			name: siteConfig.siteName,
 			description: siteConfig.siteDescription,
 			url: siteConfig.siteUrl,
-			logo: buildAbsoluteUrl(siteConfig.brandMarkPath)
+			logo: buildAbsoluteUrl(siteConfig.brandMarkPath),
+			email: siteConfig.founder.email,
+			founder: {
+				"@type": "Person",
+				name: siteConfig.founder.name
+			}
 		}
 	: undefined;
 
@@ -74,6 +79,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 
 			:root {
 				--color-ink: #0f1720;
+				--color-on-dark: #ffffff;
 				--color-muted: #52606d;
 				--color-paper: #f7f4ec;
 				--color-panel: rgba(255, 255, 255, 0.74);
@@ -172,9 +178,50 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 			}
 
 			.site-footer {
-				padding: var(--space-8) 0 var(--space-12);
+				display: grid;
+				gap: var(--space-4);
+				padding: var(--space-12) 0;
+				border-top: 1px solid var(--color-border);
 				color: var(--color-muted);
 				font-size: 0.95rem;
+			}
+
+			.site-footer-main {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: var(--space-4);
+				flex-wrap: wrap;
+			}
+
+			.site-footer-tagline {
+				margin: 0;
+				color: var(--color-ink);
+				font-weight: 700;
+			}
+
+			.site-footer-contact {
+				margin: 0;
+			}
+
+			.site-footer-nav {
+				display: flex;
+				gap: var(--space-4);
+				flex-wrap: wrap;
+			}
+
+			.site-footer-nav a {
+				text-decoration: none;
+			}
+
+			.site-footer-nav a:hover,
+			.site-footer-contact a:hover {
+				color: var(--color-ink);
+			}
+
+			.site-footer-copyright {
+				margin: 0;
+				font-size: 0.85rem;
 			}
 
 			.skip-link {
@@ -185,7 +232,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 				padding: 0.75rem 1rem;
 				border-radius: 999px;
 				background: var(--color-ink);
-				color: white;
+				color: var(--color-on-dark);
 				text-decoration: none;
 			}
 
@@ -242,8 +289,41 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 				margin-bottom: var(--space-4);
 			}
 
+			.button {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border: 0;
+				border-radius: 999px;
+				padding: 0.9rem 1.25rem;
+				font: inherit;
+				font-weight: 700;
+				letter-spacing: 0.02em;
+				text-decoration: none;
+				cursor: pointer;
+				transition:
+					transform var(--transition-fast),
+					background-color var(--transition-fast),
+					color var(--transition-fast);
+			}
+
+			.button:hover {
+				transform: translateY(-2px);
+			}
+
+			.button-primary {
+				background: var(--color-ink);
+				color: var(--color-on-dark);
+			}
+
+			.button-secondary {
+				background: var(--color-button-secondary);
+				border: 1px solid var(--color-border);
+			}
+
 			@media (max-width: 720px) {
-				.site-header {
+				.site-header,
+				.site-footer-main {
 					align-items: flex-start;
 					flex-direction: column;
 				}
@@ -258,16 +338,29 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 					<img class="brand-mark" src={siteConfig.brandMarkPath} alt="" width="44" height="44" />
 				</a>
 				<nav class="site-nav" aria-label="Primary">
+					<a href={vatLoomConfig.path}>VatLoom</a>
 					<a href="/#projects">Projects</a>
 					<a href="/blog/">Blog</a>
-					<a href="/legal/">Legal</a>
 				</nav>
 			</header>
 			<main id="main-content">
 				<slot />
 			</main>
 			<footer class="site-footer">
-				<p>{siteConfig.siteTagline}</p>
+				<div class="site-footer-main">
+					<p class="site-footer-tagline">{siteConfig.siteTagline}</p>
+					<p class="site-footer-contact">
+						{siteConfig.founder.name} · <a href={`mailto:${siteConfig.founder.email}`}>{siteConfig.founder.email}</a>
+					</p>
+				</div>
+				<nav class="site-footer-nav" aria-label="Footer">
+					<a href={vatLoomConfig.path}>VatLoom</a>
+					<a href={habitoroConfig.websiteUrl}>Habitoro</a>
+					<a href="/#projects">Projects</a>
+					<a href="/blog/">Blog</a>
+					<a href="/legal/">Legal</a>
+				</nav>
+				<p class="site-footer-copyright">© {new Date().getFullYear()} {siteConfig.siteName}</p>
 			</footer>
 		</div>
 	</body>
