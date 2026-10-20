@@ -2,7 +2,7 @@ const siteUrlValue = import.meta.env.SITE_URL ?? import.meta.env.PUBLIC_SITE_URL
 
 export const siteConfig = {
 	siteName: "Eclectic Byte",
-	siteTagline: "Small software for specific problems.",
+	siteTagline: "Specialized software for practical problems.",
 	siteDescription:
 		"Vladimir Vujosevic builds VatLoom, Habitoro, and small iOS utilities, plus private commerce integrations for Shopify stores.",
 	siteUrl: siteUrlValue,
