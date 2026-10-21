@@ -1,5 +1,6 @@
 ---
 import { buildAbsoluteUrl, habitoroConfig, siteConfig, vatLoomConfig } from "../site-config";
+import BackgroundScene from "../components/BackgroundScene.astro";
 
 interface Props {
 	title: string;
@@ -111,6 +112,18 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 				--blur-in-duration: 500ms;
 				--blur-in-offset: 20px;
 				--blur-in-radius: 20px;
+				--color-brand-navy: #0c1b28;
+				--color-brand-orange: #ff823b;
+				--scene-fog-navy-opacity: 0.1;
+				--scene-fog-orange-opacity: 0.12;
+				--scene-fog-drift-navy-duration: 64s;
+				--scene-fog-drift-orange-duration: 52s;
+				--scene-mark-glow-opacity: 0.14;
+				--scene-mark-glow-blur: 44px;
+				--scene-mark-edge-opacity: 0.1;
+				--scene-mark-edge-blur: 1.2px;
+				--scene-mark-shift-max: 18px;
+				--scene-mark-drift-duration: 40s;
 			}
 
 			* {
@@ -136,6 +149,8 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 			}
 
 			.page-shell {
+				position: relative;
+				z-index: 1;
 				width: min(calc(100% - 2rem), var(--content-width));
 				margin: 0 auto;
 			}
@@ -331,6 +346,7 @@ const schemaGraph = [organizationSchema, ...structuredDataEntries].filter(Boolea
 		</style>
 	</head>
 	<body>
+		<BackgroundScene />
 		<div class="page-shell">
 			<a class="skip-link" href="#main-content">Skip to content</a>
 			<header class="site-header">

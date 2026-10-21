@@ -1,0 +1,176 @@
+---
+import { siteConfig } from "../site-config";
+
+const sparkConfig = {
+	maxSparks: 110,
+	minSparks: 26,
+	areaPerSpark: 24000,
+	speed: 9,
+	sway: 1.4,
+	repelRadius: 150,
+	repelForce: 30,
+	fpsCap: 60,
+	dprCap: 1.5
+};
+---
+
+<div class="scene" data-scene-root aria-hidden="true">
+	<div class="scene-fog scene-fog-navy"></div>
+	<div class="scene-fog scene-fog-orange"></div>
+	<div class="scene-mark-center">
+		<div class="scene-mark-parallax">
+			<div class="scene-mark-drift">
+				<img
+					class="scene-mark-layer scene-mark-glow"
+					src={siteConfig.brandMarkPath}
+					alt=""
+					width="430"
+					height="300"
+					decoding="async"
+				/>
+				<img
+					class="scene-mark-layer scene-mark-edge"
+					src={siteConfig.brandMarkPath}
+					alt=""
+					width="430"
+					height="300"
+					decoding="async"
+				/>
+			</div>
+		</div>
+	</div>
+	<canvas
+		class="scene-sparks"
+		data-scene-sparks
+		data-max-sparks={sparkConfig.maxSparks}
+		data-min-sparks={sparkConfig.minSparks}
+		data-area-per-spark={sparkConfig.areaPerSpark}
+		data-speed={sparkConfig.speed}
+		data-sway={sparkConfig.sway}
+		data-repel-radius={sparkConfig.repelRadius}
+		data-repel-force={sparkConfig.repelForce}
+		data-fps-cap={sparkConfig.fpsCap}
+		data-dpr-cap={sparkConfig.dprCap}
+	></canvas>
+</div>
+
+<script>
+	import { initBackgroundScene } from "../lib/background-scene";
+
+	const canvas = document.querySelector("[data-scene-sparks]");
+	if (canvas instanceof HTMLCanvasElement) {
+		initBackgroundScene(canvas);
+	}
+</script>
+
+<style>
+	.scene {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.scene-fog {
+		position: absolute;
+		inset: -12%;
+	}
+
+	.scene-fog-navy {
+		background: radial-gradient(circle at 78% 16%, var(--color-brand-navy), transparent 62%);
+		opacity: var(--scene-fog-navy-opacity);
+		animation: scene-fog-drift-navy var(--scene-fog-drift-navy-duration) ease-in-out infinite alternate;
+	}
+
+	.scene-fog-orange {
+		background: radial-gradient(circle at 22% 84%, var(--color-brand-orange), transparent 60%);
+		opacity: var(--scene-fog-orange-opacity);
+		animation: scene-fog-drift-orange var(--scene-fog-drift-orange-duration) ease-in-out infinite alternate;
+	}
+
+	.scene-mark-center {
+		position: absolute;
+		left: 52%;
+		top: 38%;
+		width: min(48vw, 36rem);
+		transform: translate(-50%, -50%);
+	}
+
+	.scene-mark-parallax {
+		transform: translate3d(
+			calc(var(--scene-pointer-x, 0) * var(--scene-mark-shift-max)),
+			calc(var(--scene-pointer-y, 0) * var(--scene-mark-shift-max) * 0.7),
+			0
+		);
+	}
+
+	.scene-mark-drift {
+		position: relative;
+		aspect-ratio: 43 / 30;
+		animation: scene-mark-drift var(--scene-mark-drift-duration) ease-in-out infinite alternate;
+	}
+
+	.scene-mark-layer {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.scene-mark-glow {
+		filter: blur(var(--scene-mark-glow-blur));
+		opacity: var(--scene-mark-glow-opacity);
+	}
+
+	.scene-mark-edge {
+		filter: blur(var(--scene-mark-edge-blur));
+		opacity: var(--scene-mark-edge-opacity);
+	}
+
+	.scene-sparks {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	@keyframes scene-fog-drift-navy {
+		from {
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+		to {
+			transform: translate3d(-4%, 3%, 0) scale(1.08);
+		}
+	}
+
+	@keyframes scene-fog-drift-orange {
+		from {
+			transform: translate3d(0, 0, 0) scale(1.04);
+		}
+		to {
+			transform: translate3d(3%, -2%, 0) scale(1);
+		}
+	}
+
+	@keyframes scene-mark-drift {
+		from {
+			transform: rotate(-1deg) scale(1);
+		}
+		to {
+			transform: rotate(1.2deg) scale(1.03);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.scene-fog,
+		.scene-mark-drift {
+			animation: none;
+		}
+
+		.scene-sparks {
+			display: none;
+		}
+	}
+</style>
