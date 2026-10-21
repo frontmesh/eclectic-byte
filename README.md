@@ -29,7 +29,7 @@ VatLoom is a Shopify app. Its public page lives at `/vatloom/` and is configured
 
 To enable the embedded launch-update form:
 
-1. Create a Buttondown account and enable double opt-in.
+1. Create and confirm a Buttondown account, enable double opt-in, and check that the newsletter URL resolves.
 2. Set `buttondownUsername`; point `privacyUrl` and `supportUrl` at the live VatLoom app pages.
 3. Confirm `/privacy/` accurately describes the launch-update emails and Buttondown.
 4. Rebuild and test the signup, confirmation, and unsubscribe flow.
