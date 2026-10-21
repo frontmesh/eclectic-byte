@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Eclectic Byte social card</title>
-  <desc id="desc">A social preview image for Eclectic Byte and the Video Compressor product.</desc>
+  <desc id="desc">A social preview image for Eclectic Byte and VatLoom.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#f3ecda" />
@@ -10,11 +10,11 @@
   <rect width="1200" height="630" fill="url(#bg)" />
   <circle cx="150" cy="88" r="180" fill="#ef7d42" opacity="0.12" />
   <text x="70" y="126" font-family="Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="4" fill="#0f1720">ECLECTIC BYTE</text>
-  <text x="70" y="252" font-family="Georgia, serif" font-size="98" fill="#0f1720">Focused software.</text>
-  <text x="70" y="350" font-family="Georgia, serif" font-size="98" fill="#0f1720">Clear product surfaces.</text>
-  <rect x="720" y="170" width="390" height="280" rx="34" fill="#ffffff" opacity="0.88" stroke="#e8dcc7" />
-  <text x="760" y="228" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="4" fill="#bc4728">CURRENT FOCUS</text>
-  <text x="760" y="302" font-family="Georgia, serif" font-size="56" fill="#0f1720">Video Compressor</text>
-  <text x="760" y="362" font-family="Arial, sans-serif" font-size="30" fill="#52606d">Legal pages and company site</text>
-  <text x="760" y="405" font-family="Arial, sans-serif" font-size="30" fill="#52606d">ready to extend with product URLs.</text>
+  <text x="70" y="272" font-family="Georgia, serif" font-size="86" fill="#0f1720">Specialized software.</text>
+  <text x="70" y="368" font-family="Georgia, serif" font-size="86" fill="#0f1720">For practical problems.</text>
+  <line x1="70" y1="430" x2="1130" y2="430" stroke="#e8dcc7" stroke-width="2" />
+  <text x="70" y="486" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="4" fill="#bc4728">CURRENT FOCUS</text>
+  <text x="70" y="548" font-family="Georgia, serif" font-size="48" fill="#0f1720">VatLoom</text>
+  <text x="300" y="540" font-family="Arial, sans-serif" font-size="30" fill="#52606d">EU OSS VAT for Shopify</text>
+  <text x="300" y="580" font-family="Arial, sans-serif" font-size="30" fill="#52606d">In Shopify review</text>
 </svg>
