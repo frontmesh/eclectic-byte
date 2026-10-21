@@ -10,6 +10,39 @@ interface SparkTuning {
 	dprCap: number;
 }
 
+interface BokehTuning {
+	minWidth: number;
+	minCount: number;
+	maxCount: number;
+	widthDivisor: number;
+	radiusMin: number;
+	radiusMax: number;
+	alphaMin: number;
+	alphaMax: number;
+}
+
+interface BokehStyle {
+	color: Rgb;
+	alphaScale: number;
+}
+
+interface BokehBlob {
+	x: number;
+	y: number;
+	vx: number;
+	vy: number;
+	radius: number;
+	peakAlpha: number;
+	alphaScale: number;
+	life: number;
+	period: number;
+	swayAmplitude: number;
+	swayFrequency: number;
+	swayPhase: number;
+	spriteKey: string;
+	depthAxis: "x" | "y";
+}
+
 interface Spark {
 	x: number;
 	y: number;
@@ -53,6 +86,22 @@ const SPARK_SPRITE_ALPHAS: readonly [number, number, number] = [1, 0.42, 0];
 const ORANGE_SPARK_WEIGHT = 3;
 const DPR_FLOOR = 1;
 const FPS_FLOOR_COARSE = 30;
+const BOKEH_ORANGE_WEIGHT = 4;
+const BOKEH_NAVY_ALPHA_SCALE = 0.45;
+const BOKEH_SPEED_FLOOR = 3;
+const BOKEH_SPEED_JITTER = 4;
+const BOKEH_RADIUS_MARGIN = 0.6;
+const BOKEH_BAND_FRACTION = 0.22;
+const BOKEH_SIDE_LEFT = 0.35;
+const BOKEH_SIDE_RIGHT = 0.7;
+const BOKEH_SIDE_TOP = 0.85;
+const BOKEH_PERIOD_FLOOR = 20;
+const BOKEH_PERIOD_JITTER = 20;
+const BOKEH_SWAY_AMPLITUDE_FLOOR = 10;
+const BOKEH_SWAY_AMPLITUDE_JITTER = 14;
+const BOKEH_SWAY_BASELINE = 0.02;
+const BOKEH_SWAY_JITTER = 0.04;
+const BOKEH_BOUNCE_MARGIN = 0.5;
 
 const DEFAULT_TUNING: SparkTuning = {
 	maxSparks: 110,
@@ -64,6 +113,17 @@ const DEFAULT_TUNING: SparkTuning = {
 	repelForce: 30,
 	fpsCap: 60,
 	dprCap: 1.5
+};
+
+const DEFAULT_BOKEH_TUNING: BokehTuning = {
+	minWidth: 1200,
+	minCount: 20,
+	maxCount: 34,
+	widthDivisor: 62,
+	radiusMin: 36,
+	radiusMax: 100,
+	alphaMin: 0.05,
+	alphaMax: 0.11
 };
 
 function clamp(value: number, min: number, max: number): number {
@@ -97,6 +157,19 @@ function readTuning(dataset: DOMStringMap): SparkTuning {
 	};
 }
 
+function readBokehTuning(dataset: DOMStringMap): BokehTuning {
+	return {
+		minWidth: readNumber(dataset.bokehMinWidth, DEFAULT_BOKEH_TUNING.minWidth, 0, 4000),
+		minCount: readNumber(dataset.bokehMin, DEFAULT_BOKEH_TUNING.minCount, 0, 200),
+		maxCount: readNumber(dataset.bokehMax, DEFAULT_BOKEH_TUNING.maxCount, 1, 300),
+		widthDivisor: readNumber(dataset.bokehPerWidth, DEFAULT_BOKEH_TUNING.widthDivisor, 10, 1000),
+		radiusMin: readNumber(dataset.bokehRadiusMin, DEFAULT_BOKEH_TUNING.radiusMin, 4, 400),
+		radiusMax: readNumber(dataset.bokehRadiusMax, DEFAULT_BOKEH_TUNING.radiusMax, 8, 600),
+		alphaMin: readNumber(dataset.bokehAlphaMin, DEFAULT_BOKEH_TUNING.alphaMin, 0, 1),
+		alphaMax: readNumber(dataset.bokehAlphaMax, DEFAULT_BOKEH_TUNING.alphaMax, 0, 1)
+	};
+}
+
 function parseHexColor(value: string): Rgb | undefined {
 	const trimmed = value.trim().replace("#", "");
 	const normalized = trimmed.length === 3 ? trimmed.replace(/./g, (char) => char + char) : trimmed;
@@ -117,23 +190,47 @@ function toRgba(color: Rgb, alpha: number): string {
 	return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
 }
 
-function readPalette(root: HTMLElement | null): Rgb[] {
+interface BrandColors {
+	orange: Rgb | undefined;
+	navy: Rgb | undefined;
+}
+
+function readBrandColors(root: HTMLElement | null): BrandColors {
 	const source = root ?? document.documentElement;
 	const styles = getComputedStyle(source);
-	const orange = parseHexColor(styles.getPropertyValue("--color-brand-orange"));
-	const navy = parseHexColor(styles.getPropertyValue("--color-brand-navy"));
 
+	return {
+		orange: parseHexColor(styles.getPropertyValue("--color-brand-orange")),
+		navy: parseHexColor(styles.getPropertyValue("--color-brand-navy"))
+	};
+}
+
+function sparkPalette(colors: BrandColors): Rgb[] {
 	const palette: Rgb[] = [];
 	for (let index = 0; index < ORANGE_SPARK_WEIGHT; index += 1) {
-		if (orange) {
-			palette.push(orange);
+		if (colors.orange) {
+			palette.push(colors.orange);
 		}
 	}
-	if (navy) {
-		palette.push(navy);
+	if (colors.navy) {
+		palette.push(colors.navy);
 	}
 
 	return palette;
+}
+
+function bokehStyles(colors: BrandColors): BokehStyle[] {
+	const styles: BokehStyle[] = [];
+	for (let index = 0; index < BOKEH_ORANGE_WEIGHT; index += 1) {
+		if (colors.orange) {
+			styles.push({ color: colors.orange, alphaScale: 1 });
+		}
+	}
+	if (colors.navy) {
+		styles.push({ color: colors.navy, alphaScale: BOKEH_NAVY_ALPHA_SCALE });
+	}
+
+	return styles;
 }
 
 function createSparkSprite(color: Rgb): HTMLCanvasElement | undefined {
@@ -167,14 +264,19 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 
 	const root = canvas.closest<HTMLElement>("[data-scene-root]");
 	const tuning = readTuning(canvas.dataset);
-	const palette = readPalette(root);
+	const brandColors = readBrandColors(root);
+	const palette = sparkPalette(brandColors);
+	const edgeStyles = bokehStyles(brandColors);
+	const bokehTuning = readBokehTuning(canvas.dataset);
 	const reduceMotion = window.matchMedia(REDUCED_MOTION_QUERY);
 	const finePointer = window.matchMedia(FINE_POINTER_QUERY);
+	const edgeQuery = window.matchMedia(`(min-width: ${bokehTuning.minWidth}px)`);
 	const effectiveFpsCap = finePointer.matches ? tuning.fpsCap : Math.min(tuning.fpsCap, FPS_FLOOR_COARSE);
 	const frameInterval = 1000 / effectiveFpsCap;
 	const sprites = new Map<string, HTMLCanvasElement>();
 
 	let sparks: Spark[] = [];
+	let bokeh: BokehBlob[] = [];
 	let width = 0;
 	let height = 0;
 	let running = false;
@@ -245,6 +347,148 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		}
 	}
 
+	function bokehCount(): number {
+		const byWidth = Math.round(width / bokehTuning.widthDivisor);
+		return clamp(byWidth, bokehTuning.minCount, bokehTuning.maxCount);
+	}
+
+	function placeBokeh(blob: BokehBlob): void {
+		const radiusSpan = bokehTuning.radiusMax - bokehTuning.radiusMin;
+		const alphaSpan = bokehTuning.alphaMax - bokehTuning.alphaMin;
+		const speed = BOKEH_SPEED_FLOOR + Math.random() * BOKEH_SPEED_JITTER;
+		const sign = Math.random() < 0.5 ? -1 : 1;
+
+		blob.radius = bokehTuning.radiusMin + Math.random() * radiusSpan;
+		blob.peakAlpha = bokehTuning.alphaMin + Math.random() * alphaSpan;
+		blob.life = 0;
+		blob.period = BOKEH_PERIOD_FLOOR + Math.random() * BOKEH_PERIOD_JITTER;
+		blob.swayAmplitude = BOKEH_SWAY_AMPLITUDE_FLOOR + Math.random() * BOKEH_SWAY_AMPLITUDE_JITTER;
+		blob.swayFrequency = BOKEH_SWAY_BASELINE + Math.random() * BOKEH_SWAY_JITTER;
+		blob.swayPhase = Math.random() * Math.PI * 2;
+		blob.vx = 0;
+		blob.vy = 0;
+
+		const radiusMargin = blob.radius * BOKEH_RADIUS_MARGIN;
+		const bandX = width * BOKEH_BAND_FRACTION;
+		const bandY = height * BOKEH_BAND_FRACTION;
+		const roll = Math.random();
+		if (roll < BOKEH_SIDE_LEFT) {
+			blob.depthAxis = "x";
+			blob.x = -radiusMargin + Math.random() * (bandX + radiusMargin);
+			blob.y = Math.random() * height;
+			blob.vy = sign * speed;
+		} else if (roll < BOKEH_SIDE_RIGHT) {
+			blob.depthAxis = "x";
+			blob.x = width + radiusMargin - Math.random() * (bandX + radiusMargin);
+			blob.y = Math.random() * height;
+			blob.vy = sign * speed;
+		} else if (roll < BOKEH_SIDE_TOP) {
+			blob.depthAxis = "y";
+			blob.x = Math.random() * width;
+			blob.y = -radiusMargin + Math.random() * (bandY + radiusMargin);
+			blob.vx = sign * speed;
+		} else {
+			blob.depthAxis = "y";
+			blob.x = Math.random() * width;
+			blob.y = height + radiusMargin - Math.random() * (bandY + radiusMargin);
+			blob.vx = sign * speed;
+		}
+	}
+
+	function createBokeh(): BokehBlob | undefined {
+		const style = edgeStyles[Math.floor(Math.random() * edgeStyles.length)];
+		if (!style) {
+			return undefined;
+		}
+
+		const spriteKey = spriteKeyFor(style.color);
+		if (!sprites.has(spriteKey)) {
+			const sprite = createSparkSprite(style.color);
+			if (!sprite) {
+				return undefined;
+			}
+			sprites.set(spriteKey, sprite);
+		}
+
+		const blob: BokehBlob = {
+			x: 0,
+			y: 0,
+			vx: 0,
+			vy: 0,
+			radius: 0,
+			peakAlpha: 0,
+			alphaScale: style.alphaScale,
+			life: 0,
+			period: 1,
+			swayAmplitude: 0,
+			swayFrequency: 0,
+			swayPhase: 0,
+			spriteKey,
+			depthAxis: "x"
+		};
+		placeBokeh(blob);
+		return blob;
+	}
+
+	function seedBokeh(): void {
+		if (!edgeQuery.matches || edgeStyles.length === 0) {
+			bokeh = [];
+			return;
+		}
+
+		const target = bokehCount();
+		while (bokeh.length < target) {
+			const blob = createBokeh();
+			if (!blob) {
+				break;
+			}
+			bokeh.push(blob);
+		}
+		if (bokeh.length > target) {
+			bokeh.length = target;
+		}
+	}
+
+	function bounceBokeh(blob: BokehBlob): void {
+		const limit = blob.radius * BOKEH_BOUNCE_MARGIN;
+
+		if (blob.depthAxis === "x") {
+			if (blob.y < -limit) {
+				blob.y = -limit;
+				blob.vy = Math.abs(blob.vy);
+			} else if (blob.y > height + limit) {
+				blob.y = height + limit;
+				blob.vy = -Math.abs(blob.vy);
+			}
+			return;
+		}
+
+		if (blob.x < -limit) {
+			blob.x = -limit;
+			blob.vx = Math.abs(blob.vx);
+		} else if (blob.x > width + limit) {
+			blob.x = width + limit;
+			blob.vx = -Math.abs(blob.vx);
+		}
+	}
+
+	function stepBokeh(delta: number): void {
+		for (const blob of bokeh) {
+			blob.life += delta;
+			if (blob.life >= blob.period) {
+				placeBokeh(blob);
+				continue;
+			}
+
+			if (blob.depthAxis === "x") {
+				blob.y += blob.vy * delta;
+			} else {
+				blob.x += blob.vx * delta;
+			}
+			bounceBokeh(blob);
+		}
+	}
+
 	function resize(): void {
 		const dpr = clamp(window.devicePixelRatio || 1, DPR_FLOOR, tuning.dprCap);
 		const nextWidth = window.innerWidth;
@@ -259,11 +503,13 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		width = nextWidth;
 		height = nextHeight;
 		seedSparks();
+		seedBokeh();
 	}
 
 	function step(delta: number): void {
 		const damping = 1 - Math.exp(-delta * REPEL_DAMPING);
 		elapsed += delta;
+		stepBokeh(delta);
 
 		for (const spark of sparks) {
 			if (pointer.active) {
@@ -300,6 +546,26 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 
 	function draw(): void {
 		context.clearRect(0, 0, width, height);
+
+		for (const blob of bokeh) {
+			const sprite = sprites.get(blob.spriteKey);
+			if (!sprite) {
+				continue;
+			}
+
+			const envelope = Math.max(Math.sin(Math.PI * (blob.life / blob.period)), 0);
+			if (envelope <= 0) {
+				continue;
+			}
+
+			const sway = Math.sin(elapsed * blob.swayFrequency * Math.PI * 2 + blob.swayPhase) * blob.swayAmplitude;
+			const size = blob.radius * 2;
+			const offsetX = blob.depthAxis === "x" ? sway : 0;
+			const offsetY = blob.depthAxis === "y" ? sway : 0;
+
+			context.globalAlpha = blob.peakAlpha * blob.alphaScale * envelope;
+			context.drawImage(sprite, blob.x + offsetX - size / 2, blob.y + offsetY - size / 2, size, size);
+		}
 
 		for (const spark of sparks) {
 			const sprite = sprites.get(spark.spriteKey);
@@ -402,11 +668,19 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		}
 	}
 
+	function onEdgeChange(): void {
+		seedBokeh();
+		if (!running) {
+			draw();
+		}
+	}
+
 	resize();
 
 	window.addEventListener("resize", onResize, { passive: true });
 	document.addEventListener("visibilitychange", onVisibilityChange);
 	reduceMotion.addEventListener("change", onMotionChange);
+	edgeQuery.addEventListener("change", onEdgeChange);
 
 	if (finePointer.matches) {
 		window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -419,6 +693,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		window.removeEventListener("resize", onResize);
 		document.removeEventListener("visibilitychange", onVisibilityChange);
 		reduceMotion.removeEventListener("change", onMotionChange);
+		edgeQuery.removeEventListener("change", onEdgeChange);
 		window.removeEventListener("pointermove", onPointerMove);
 	};
 }

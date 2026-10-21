@@ -12,6 +12,17 @@ const sparkConfig = {
 	fpsCap: 60,
 	dprCap: 1.5
 };
+
+const bokehConfig = {
+	minWidth: 1200,
+	minCount: 20,
+	maxCount: 34,
+	widthDivisor: 62,
+	radiusMin: 36,
+	radiusMax: 100,
+	alphaMin: 0.05,
+	alphaMax: 0.11
+};
 ---
 
 <div class="scene" data-scene-root aria-hidden="true">
@@ -51,6 +62,14 @@ const sparkConfig = {
 		data-repel-force={sparkConfig.repelForce}
 		data-fps-cap={sparkConfig.fpsCap}
 		data-dpr-cap={sparkConfig.dprCap}
+		data-bokeh-min-width={bokehConfig.minWidth}
+		data-bokeh-min={bokehConfig.minCount}
+		data-bokeh-max={bokehConfig.maxCount}
+		data-bokeh-per-width={bokehConfig.widthDivisor}
+		data-bokeh-radius-min={bokehConfig.radiusMin}
+		data-bokeh-radius-max={bokehConfig.radiusMax}
+		data-bokeh-alpha-min={bokehConfig.alphaMin}
+		data-bokeh-alpha-max={bokehConfig.alphaMax}
 	></canvas>
 </div>
 
