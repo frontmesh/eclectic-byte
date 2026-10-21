@@ -34,6 +34,8 @@ To enable the embedded launch-update form:
 3. Confirm `/privacy/` accurately describes the launch-update emails and Buttondown.
 4. Rebuild and test the signup, confirmation, and unsubscribe flow.
 
+Buttondown reviews new accounts before they can collect subscribers or publish the newsletter page. The launch form will not complete signups until Buttondown approves the account.
+
 VatLoom’s page must not claim filing, tax advice, collaboration, multi-store support, threshold monitoring, or a privacy guarantee that has not been verified. The sample report is illustrative and must stay labeled as such. Merchant case-study material and screenshots require merchant approval before publication.
 
 ## Legal Source Of Truth
