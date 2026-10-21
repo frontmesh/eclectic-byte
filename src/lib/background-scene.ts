@@ -19,6 +19,9 @@ interface BokehTuning {
 	radiusMax: number;
 	alphaMin: number;
 	alphaMax: number;
+	textDistance: number;
+	textRadiusScale: number;
+	textAlphaScale: number;
 }
 
 interface BokehStyle {
@@ -29,7 +32,6 @@ interface BokehStyle {
 interface BokehBlob {
 	x: number;
 	y: number;
-	vx: number;
 	vy: number;
 	radius: number;
 	peakAlpha: number;
@@ -39,8 +41,7 @@ interface BokehBlob {
 	swayAmplitude: number;
 	swayFrequency: number;
 	swayPhase: number;
-	spriteKey: string;
-	depthAxis: "x" | "y";
+	colorKey: string;
 }
 
 interface Spark {
@@ -55,7 +56,7 @@ interface Spark {
 	swayAmplitude: number;
 	swayFrequency: number;
 	phase: number;
-	spriteKey: string;
+	colorKey: string;
 }
 
 interface Rgb {
@@ -81,8 +82,15 @@ const SPARK_ALPHA_JITTER = 0.3;
 const SWAY_AMPLITUDE_FLOOR = 6;
 const SWAY_AMPLITUDE_JITTER = 14;
 const SPARK_SPRITE_SIZE = 48;
-const SPARK_SPRITE_STOPS: readonly [number, number, number] = [0, 0.35, 1];
-const SPARK_SPRITE_ALPHAS: readonly [number, number, number] = [1, 0.42, 0];
+
+type SpriteProfile = "soft" | "diffuse";
+
+const SPRITE_PROFILES: Record<SpriteProfile, { stops: readonly [number, number, number]; alphas: readonly [number, number, number] }> =
+	{
+		soft: { stops: [0, 0.35, 1], alphas: [1, 0.42, 0] },
+		diffuse: { stops: [0, 0.45, 1], alphas: [0.5, 0.26, 0] }
+	};
+
 const ORANGE_SPARK_WEIGHT = 3;
 const DPR_FLOOR = 1;
 const FPS_FLOOR_COARSE = 30;
@@ -91,10 +99,9 @@ const BOKEH_NAVY_ALPHA_SCALE = 0.45;
 const BOKEH_SPEED_FLOOR = 3;
 const BOKEH_SPEED_JITTER = 4;
 const BOKEH_RADIUS_MARGIN = 0.6;
-const BOKEH_BAND_FRACTION = 0.22;
-const BOKEH_SIDE_LEFT = 0.35;
-const BOKEH_SIDE_RIGHT = 0.7;
-const BOKEH_SIDE_TOP = 0.85;
+const BOKEH_DEPTH_BIAS = 1.8;
+const BOKEH_MAX_DEPTH_FRACTION = 0.48;
+const BOKEH_SIDE_LEFT = 0.5;
 const BOKEH_PERIOD_FLOOR = 20;
 const BOKEH_PERIOD_JITTER = 20;
 const BOKEH_SWAY_AMPLITUDE_FLOOR = 10;
@@ -117,17 +124,28 @@ const DEFAULT_TUNING: SparkTuning = {
 
 const DEFAULT_BOKEH_TUNING: BokehTuning = {
 	minWidth: 1200,
-	minCount: 20,
+	minCount: 22,
 	maxCount: 34,
 	widthDivisor: 62,
 	radiusMin: 36,
 	radiusMax: 100,
 	alphaMin: 0.05,
-	alphaMax: 0.11
+	alphaMax: 0.11,
+	textDistance: 220,
+	textRadiusScale: 1.5,
+	textAlphaScale: 0.35
 };
 
 function clamp(value: number, min: number, max: number): number {
 	return Math.min(Math.max(value, min), max);
+}
+
+function lerp(from: number, to: number, factor: number): number {
+	return from + (to - from) * factor;
+}
+
+function smoothstep(factor: number): number {
+	return factor * factor * (3 - 2 * factor);
 }
 
 function readNumber(value: string | undefined, fallback: number, min: number, max: number): number {
@@ -166,7 +184,10 @@ function readBokehTuning(dataset: DOMStringMap): BokehTuning {
 		radiusMin: readNumber(dataset.bokehRadiusMin, DEFAULT_BOKEH_TUNING.radiusMin, 4, 400),
 		radiusMax: readNumber(dataset.bokehRadiusMax, DEFAULT_BOKEH_TUNING.radiusMax, 8, 600),
 		alphaMin: readNumber(dataset.bokehAlphaMin, DEFAULT_BOKEH_TUNING.alphaMin, 0, 1),
-		alphaMax: readNumber(dataset.bokehAlphaMax, DEFAULT_BOKEH_TUNING.alphaMax, 0, 1)
+		alphaMax: readNumber(dataset.bokehAlphaMax, DEFAULT_BOKEH_TUNING.alphaMax, 0, 1),
+		textDistance: readNumber(dataset.bokehTextDistance, DEFAULT_BOKEH_TUNING.textDistance, 1, 2000),
+		textRadiusScale: readNumber(dataset.bokehTextRadiusScale, DEFAULT_BOKEH_TUNING.textRadiusScale, 1, 4),
+		textAlphaScale: readNumber(dataset.bokehTextAlphaScale, DEFAULT_BOKEH_TUNING.textAlphaScale, 0, 1)
 	};
 }
 
@@ -233,7 +254,7 @@ function bokehStyles(colors: BrandColors): BokehStyle[] {
 	return styles;
 }
 
-function createSparkSprite(color: Rgb): HTMLCanvasElement | undefined {
+function createSprite(color: Rgb, profile: SpriteProfile): HTMLCanvasElement | undefined {
 	const sprite = document.createElement("canvas");
 	sprite.width = SPARK_SPRITE_SIZE;
 	sprite.height = SPARK_SPRITE_SIZE;
@@ -243,10 +264,11 @@ function createSparkSprite(color: Rgb): HTMLCanvasElement | undefined {
 		return undefined;
 	}
 
+	const spec = SPRITE_PROFILES[profile];
 	const center = SPARK_SPRITE_SIZE / 2;
 	const gradient = context.createRadialGradient(center, center, 0, center, center, center);
-	SPARK_SPRITE_STOPS.forEach((stop, index) => {
-		gradient.addColorStop(stop, toRgba(color, SPARK_SPRITE_ALPHAS[index] ?? 0));
+	spec.stops.forEach((stop, index) => {
+		gradient.addColorStop(stop, toRgba(color, spec.alphas[index] ?? 0));
 	});
 
 	context.fillStyle = gradient;
@@ -273,12 +295,16 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 	const edgeQuery = window.matchMedia(`(min-width: ${bokehTuning.minWidth}px)`);
 	const effectiveFpsCap = finePointer.matches ? tuning.fpsCap : Math.min(tuning.fpsCap, FPS_FLOOR_COARSE);
 	const frameInterval = 1000 / effectiveFpsCap;
+	const contentSelector = root?.dataset.sceneContent;
 	const sprites = new Map<string, HTMLCanvasElement>();
 
 	let sparks: Spark[] = [];
 	let bokeh: BokehBlob[] = [];
 	let width = 0;
 	let height = 0;
+	let contentLeft = 0;
+	let contentRight = 0;
+	let hasContent = false;
 	let running = false;
 	let animationFrame = 0;
 	let lastTimestamp = 0;
@@ -290,23 +316,66 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		return clamp(byArea, tuning.minSparks, tuning.maxSparks);
 	}
 
-	function spriteKeyFor(color: Rgb): string {
+	function colorKeyFor(color: Rgb): string {
 		return `${color.r},${color.g},${color.b}`;
+	}
+
+	function spriteKeyFor(colorKey: string, profile: SpriteProfile): string {
+		return `${profile}:${colorKey}`;
+	}
+
+	function ensureSprite(color: Rgb, profile: SpriteProfile): boolean {
+		const colorKey = colorKeyFor(color);
+		const key = spriteKeyFor(colorKey, profile);
+		if (sprites.has(key)) {
+			return true;
+		}
+
+		const sprite = createSprite(color, profile);
+		if (!sprite) {
+			return false;
+		}
+		sprites.set(key, sprite);
+		return true;
+	}
+
+	function measureContent(): void {
+		if (!contentSelector) {
+			hasContent = false;
+			return;
+		}
+
+		const shell = document.querySelector(contentSelector);
+		if (!shell) {
+			hasContent = false;
+			return;
+		}
+
+		const rect = shell.getBoundingClientRect();
+		hasContent = rect.width > 0;
+		contentLeft = rect.left;
+		contentRight = rect.right;
+	}
+
+	function textBlurFactor(x: number): number {
+		if (!hasContent) {
+			return 0;
+		}
+
+		let distance = 0;
+		if (x < contentLeft) {
+			distance = contentLeft - x;
+		} else if (x > contentRight) {
+			distance = x - contentRight;
+		}
+
+		return smoothstep(clamp(1 - distance / bokehTuning.textDistance, 0, 1));
 	}
 
 	function createSpark(): Spark | undefined {
 		const color = palette[Math.floor(Math.random() * palette.length)];
-		if (!color) {
+		if (!color || !ensureSprite(color, "soft")) {
 			return undefined;
-		}
-
-		const spriteKey = spriteKeyFor(color);
-		if (!sprites.has(spriteKey)) {
-			const sprite = createSparkSprite(color);
-			if (!sprite) {
-				return undefined;
-			}
-			sprites.set(spriteKey, sprite);
 		}
 
 		const direction = Math.random() * Math.PI * 2;
@@ -324,7 +393,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 			swayAmplitude: (SWAY_AMPLITUDE_FLOOR + Math.random() * SWAY_AMPLITUDE_JITTER) * tuning.sway,
 			swayFrequency: SWAY_BASELINE + Math.random() * SWAY_JITTER,
 			phase: Math.random() * Math.PI * 2,
-			spriteKey
+			colorKey: colorKeyFor(color)
 		};
 	}
 
@@ -365,34 +434,18 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		blob.swayAmplitude = BOKEH_SWAY_AMPLITUDE_FLOOR + Math.random() * BOKEH_SWAY_AMPLITUDE_JITTER;
 		blob.swayFrequency = BOKEH_SWAY_BASELINE + Math.random() * BOKEH_SWAY_JITTER;
 		blob.swayPhase = Math.random() * Math.PI * 2;
-		blob.vx = 0;
-		blob.vy = 0;
+		blob.vy = sign * speed;
 
 		const radiusMargin = blob.radius * BOKEH_RADIUS_MARGIN;
-		const bandX = width * BOKEH_BAND_FRACTION;
-		const bandY = height * BOKEH_BAND_FRACTION;
-		const roll = Math.random();
-		if (roll < BOKEH_SIDE_LEFT) {
-			blob.depthAxis = "x";
-			blob.x = -radiusMargin + Math.random() * (bandX + radiusMargin);
-			blob.y = Math.random() * height;
-			blob.vy = sign * speed;
-		} else if (roll < BOKEH_SIDE_RIGHT) {
-			blob.depthAxis = "x";
-			blob.x = width + radiusMargin - Math.random() * (bandX + radiusMargin);
-			blob.y = Math.random() * height;
-			blob.vy = sign * speed;
-		} else if (roll < BOKEH_SIDE_TOP) {
-			blob.depthAxis = "y";
-			blob.x = Math.random() * width;
-			blob.y = -radiusMargin + Math.random() * (bandY + radiusMargin);
-			blob.vx = sign * speed;
+		const reach = width * BOKEH_MAX_DEPTH_FRACTION + radiusMargin;
+		const depth = Math.pow(Math.random(), BOKEH_DEPTH_BIAS);
+
+		if (Math.random() < BOKEH_SIDE_LEFT) {
+			blob.x = -radiusMargin + depth * reach;
 		} else {
-			blob.depthAxis = "y";
-			blob.x = Math.random() * width;
-			blob.y = height + radiusMargin - Math.random() * (bandY + radiusMargin);
-			blob.vx = sign * speed;
+			blob.x = width + radiusMargin - depth * reach;
 		}
+		blob.y = Math.random() * height;
 	}
 
 	function createBokeh(): BokehBlob | undefined {
@@ -401,19 +454,13 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 			return undefined;
 		}
 
-		const spriteKey = spriteKeyFor(style.color);
-		if (!sprites.has(spriteKey)) {
-			const sprite = createSparkSprite(style.color);
-			if (!sprite) {
-				return undefined;
-			}
-			sprites.set(spriteKey, sprite);
+		if (!ensureSprite(style.color, "soft") || !ensureSprite(style.color, "diffuse")) {
+			return undefined;
 		}
 
 		const blob: BokehBlob = {
 			x: 0,
 			y: 0,
-			vx: 0,
 			vy: 0,
 			radius: 0,
 			peakAlpha: 0,
@@ -423,8 +470,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 			swayAmplitude: 0,
 			swayFrequency: 0,
 			swayPhase: 0,
-			spriteKey,
-			depthAxis: "x"
+			colorKey: colorKeyFor(style.color)
 		};
 		placeBokeh(blob);
 		return blob;
@@ -452,23 +498,12 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 	function bounceBokeh(blob: BokehBlob): void {
 		const limit = blob.radius * BOKEH_BOUNCE_MARGIN;
 
-		if (blob.depthAxis === "x") {
-			if (blob.y < -limit) {
-				blob.y = -limit;
-				blob.vy = Math.abs(blob.vy);
-			} else if (blob.y > height + limit) {
-				blob.y = height + limit;
-				blob.vy = -Math.abs(blob.vy);
-			}
-			return;
-		}
-
-		if (blob.x < -limit) {
-			blob.x = -limit;
-			blob.vx = Math.abs(blob.vx);
-		} else if (blob.x > width + limit) {
-			blob.x = width + limit;
-			blob.vx = -Math.abs(blob.vx);
+		if (blob.y < -limit) {
+			blob.y = -limit;
+			blob.vy = Math.abs(blob.vy);
+		} else if (blob.y > height + limit) {
+			blob.y = height + limit;
+			blob.vy = -Math.abs(blob.vy);
 		}
 	}
 
@@ -480,11 +515,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 				continue;
 			}
 
-			if (blob.depthAxis === "x") {
-				blob.y += blob.vy * delta;
-			} else {
-				blob.x += blob.vx * delta;
-			}
+			blob.y += blob.vy * delta;
 			bounceBokeh(blob);
 		}
 	}
@@ -502,6 +533,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 
 		width = nextWidth;
 		height = nextHeight;
+		measureContent();
 		seedSparks();
 		seedBokeh();
 	}
@@ -548,27 +580,38 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 		context.clearRect(0, 0, width, height);
 
 		for (const blob of bokeh) {
-			const sprite = sprites.get(blob.spriteKey);
-			if (!sprite) {
-				continue;
-			}
-
 			const envelope = Math.max(Math.sin(Math.PI * (blob.life / blob.period)), 0);
 			if (envelope <= 0) {
 				continue;
 			}
 
 			const sway = Math.sin(elapsed * blob.swayFrequency * Math.PI * 2 + blob.swayPhase) * blob.swayAmplitude;
-			const size = blob.radius * 2;
-			const offsetX = blob.depthAxis === "x" ? sway : 0;
-			const offsetY = blob.depthAxis === "y" ? sway : 0;
+			const centerX = blob.x + sway;
+			const blur = textBlurFactor(centerX);
+			const size = blob.radius * 2 * lerp(1, bokehTuning.textRadiusScale, blur);
+			const alpha = blob.peakAlpha * blob.alphaScale * envelope * lerp(1, bokehTuning.textAlphaScale, blur);
+			const drawX = centerX - size / 2;
+			const drawY = blob.y - size / 2;
 
-			context.globalAlpha = blob.peakAlpha * blob.alphaScale * envelope;
-			context.drawImage(sprite, blob.x + offsetX - size / 2, blob.y + offsetY - size / 2, size, size);
+			if (blur < 1) {
+				const soft = sprites.get(spriteKeyFor(blob.colorKey, "soft"));
+				if (soft) {
+					context.globalAlpha = alpha * (1 - blur);
+					context.drawImage(soft, drawX, drawY, size, size);
+				}
+			}
+
+			if (blur > 0) {
+				const diffuse = sprites.get(spriteKeyFor(blob.colorKey, "diffuse"));
+				if (diffuse) {
+					context.globalAlpha = alpha * blur;
+					context.drawImage(diffuse, drawX, drawY, size, size);
+				}
+			}
 		}
 
 		for (const spark of sparks) {
-			const sprite = sprites.get(spark.spriteKey);
+			const sprite = sprites.get(spriteKeyFor(spark.colorKey, "soft"));
 			if (!sprite) {
 				continue;
 			}

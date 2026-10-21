@@ -15,17 +15,20 @@ const sparkConfig = {
 
 const bokehConfig = {
 	minWidth: 1200,
-	minCount: 20,
+	minCount: 22,
 	maxCount: 34,
 	widthDivisor: 62,
 	radiusMin: 36,
 	radiusMax: 100,
 	alphaMin: 0.05,
-	alphaMax: 0.11
+	alphaMax: 0.11,
+	textDistance: 220,
+	textRadiusScale: 1.5,
+	textAlphaScale: 0.35
 };
 ---
 
-<div class="scene" data-scene-root aria-hidden="true">
+<div class="scene" data-scene-root data-scene-content=".page-shell" aria-hidden="true">
 	<div class="scene-fog scene-fog-navy"></div>
 	<div class="scene-fog scene-fog-orange"></div>
 	<div class="scene-mark-center">
@@ -70,6 +73,9 @@ const bokehConfig = {
 		data-bokeh-radius-max={bokehConfig.radiusMax}
 		data-bokeh-alpha-min={bokehConfig.alphaMin}
 		data-bokeh-alpha-max={bokehConfig.alphaMax}
+		data-bokeh-text-distance={bokehConfig.textDistance}
+		data-bokeh-text-radius-scale={bokehConfig.textRadiusScale}
+		data-bokeh-text-alpha-scale={bokehConfig.textAlphaScale}
 	></canvas>
 </div>
 
