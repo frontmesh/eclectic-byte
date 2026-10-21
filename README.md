@@ -21,17 +21,17 @@ The Video Compressor address is also stored in `videoCompressorConfig.supportEma
 
 VatLoom is a Shopify app. Its public page lives at `/vatloom/` and is configured in `vatLoomConfig` in `src/site-config.ts`.
 
-- `status: "review"` shows the launch-list call to action and the “In Shopify review” status on both the homepage and the VatLoom page.
+- `status: "review"` shows the launch-update form and the “In Shopify review” status on both the homepage and the VatLoom page.
 - `status: "live"` requires `listingUrl`; the build fails if it is missing. The primary CTA becomes the Shopify install link with the 14-day trial.
-- `launchListUrl` accepts a hosted signup form URL (Buttondown, Tally, or similar).
-- `buttondownUsername` plus `privacyUrl` enables the embedded Buttondown form. The form is intentionally withheld until both values exist.
-- With no hosted URL, Buttondown username, or privacy URL, the page falls back to a prefilled `mailto:` link. That is a working contact path, not a mailing list.
+- `buttondownUsername` is required while VatLoom is in review; the build fails if it is missing. The form posts directly to Buttondown and uses the `vatloom` tag.
+- `privacyUrl` is the VatLoom app privacy policy. `supportUrl` is the VatLoom support page.
+- The launch form links to the site privacy policy at `/privacy/`. That page must cover launch-update email collection and Buttondown before the form is published.
 
-To enable the embedded launch list:
+To enable the embedded launch-update form:
 
 1. Create a Buttondown account and enable double opt-in.
-2. Set `buttondownUsername` and `privacyUrl` in `vatLoomConfig`.
-3. Set `supportUrl` if VatLoom has a dedicated support page; otherwise the page uses the studio email.
+2. Set `buttondownUsername`; point `privacyUrl` and `supportUrl` at the live VatLoom app pages.
+3. Confirm `/privacy/` accurately describes the launch-update emails and Buttondown.
 4. Rebuild and test the signup, confirmation, and unsubscribe flow.
 
 VatLoom’s page must not claim filing, tax advice, collaboration, multi-store support, threshold monitoring, or a privacy guarantee that has not been verified. The sample report is illustrative and must stay labeled as such. Merchant case-study material and screenshots require merchant approval before publication.

@@ -11,17 +11,20 @@ if (isLive && !vatLoomConfig.listingUrl) {
 	throw new Error("vatLoomConfig.listingUrl must be set before VatLoom can be marked live.");
 }
 
+if (!vatLoomConfig.privacyUrl || !vatLoomConfig.supportUrl) {
+	throw new Error("vatLoomConfig.privacyUrl and supportUrl must be set before VatLoom can be published.");
+}
+
+if (!isLive && !vatLoomConfig.buttondownUsername) {
+	throw new Error("vatLoomConfig.buttondownUsername must be set for the launch signup.");
+}
+
 const pageDescription = isLive
 	? `${vatLoomConfig.description} Start a ${vatLoomConfig.trialDays}-day free trial.`
-	: `${vatLoomConfig.description} Join the launch list for the Shopify app.`;
-const launchListEmailHref = `mailto:${siteConfig.founder.email}?subject=${encodeURIComponent(vatLoomConfig.launchListSubject)}&body=${encodeURIComponent("Hi Vladimir, please add me to the VatLoom launch list.")}`;
-const supportHref =
-	vatLoomConfig.supportUrl || `mailto:${siteConfig.founder.email}?subject=VatLoom%20support`;
-const supportLabel = vatLoomConfig.supportUrl ? "Read the support page" : "Email me";
-const canEmbedSignup = Boolean(vatLoomConfig.buttondownUsername && vatLoomConfig.privacyUrl);
-const buttondownAction = canEmbedSignup
-	? `https://buttondown.com/api/emails/embed-subscribe/${vatLoomConfig.buttondownUsername}`
-	: undefined;
+	: `${vatLoomConfig.description} Get an email when the Shopify app is approved.`;
+const supportHref = vatLoomConfig.supportUrl;
+const supportLabel = "Read the support page";
+const buttondownAction = `https://buttondown.com/api/emails/embed-subscribe/${vatLoomConfig.buttondownUsername}`;
 const priceFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
 	currency: vatLoomConfig.currency
@@ -29,11 +32,11 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
 const monthlyPrice = priceFormatter.format(vatLoomConfig.priceMonthly);
 const annualPrice = priceFormatter.format(vatLoomConfig.priceAnnual);
 
-type CtaMode = "live" | "embedded" | "link" | "email";
+type CtaMode = "live" | "embedded";
 
-let ctaMode: CtaMode = "email";
-let primaryHref = launchListEmailHref;
-let primaryLabel = "Email me to join the launch list";
+let ctaMode: CtaMode = "embedded";
+let primaryHref = "#launch-list";
+let primaryLabel = "Notify me when it's live";
 let primaryExternal = false;
 
 if (isLive) {
@@ -41,27 +44,18 @@ if (isLive) {
 	primaryHref = vatLoomConfig.listingUrl;
 	primaryLabel = `Start your ${vatLoomConfig.trialDays}-day free trial`;
 	primaryExternal = true;
-} else if (canEmbedSignup) {
-	ctaMode = "embedded";
-	primaryHref = "#launch-list";
-	primaryLabel = "Join the launch list";
-} else if (vatLoomConfig.launchListUrl) {
-	ctaMode = "link";
-	primaryHref = vatLoomConfig.launchListUrl;
-	primaryLabel = "Join the launch list";
-	primaryExternal = true;
 }
 
 const statusLabel = isLive ? "Available on the Shopify App Store" : "In Shopify review";
 const statusCopy = isLive
 	? "Install VatLoom from the Shopify App Store and start your free trial."
-	: "Join the launch list and I'll send the install link when it's approved.";
+	: "Get an email when VatLoom is approved. I'll send the install link.";
 const launchHeading = isLive
 	? "Start your free trial."
 	: "Get the install link when VatLoom is approved.";
 const launchCopy = isLive
 	? "Install VatLoom from the Shopify App Store and start your free trial."
-	: "No spam. I'll email you when VatLoom is approved.";
+	: "I'll only email you about VatLoom's launch. Unsubscribe anytime.";
 
 const faqs = [
 	{
@@ -148,7 +142,6 @@ const structuredData = pageUrl
 				</a>
 				<a class="button button-secondary" href="#sample-report">See a sample report</a>
 			</div>
-			{ctaMode === "email" && <p class="product-cta-note">This opens your email app.</p>}
 		</div>
 		<div class="product-hero-report" id="sample-report">
 			<SampleReport />
@@ -331,7 +324,7 @@ const structuredData = pageUrl
 
 	<section class="product-section" id="launch-list">
 		<div class="launch-card">
-			<p class="eyebrow">{isLive ? "Get started" : "Launch list"}</p>
+			<p class="eyebrow">{isLive ? "Get started" : "Launch updates"}</p>
 			<h2>{launchHeading}</h2>
 			<p class="launch-copy">{launchCopy}</p>
 
@@ -345,24 +338,27 @@ const structuredData = pageUrl
 					>
 						<label for="launch-email">Email address</label>
 						<input type="hidden" name="embed" value="1" />
+						<input type="hidden" name="tag" value="vatloom" />
 						<div class="launch-form-row">
 							<input
 								id="launch-email"
 								type="email"
 								name="email"
 								autocomplete="email"
+								inputmode="email"
 								placeholder="you@example.com"
+								aria-describedby="launch-consent"
 								required
 							/>
 							<button class="button button-primary" type="submit">
-								Join the launch list
+								Notify me
 							</button>
 						</div>
-						<p class="launch-consent">
-							By joining, you agree to receive launch updates about VatLoom. Unsubscribe
+						<p class="launch-consent" id="launch-consent">
+							I'll only use your email to send VatLoom launch updates. Unsubscribe
 							anytime.{" "}
 							<a
-								href={vatLoomConfig.privacyUrl}
+								href={siteConfig.privacyPath}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -374,7 +370,7 @@ const structuredData = pageUrl
 			}
 
 			{
-				ctaMode !== "embedded" && (
+				ctaMode === "live" && (
 					<div class="launch-actions">
 						<a
 							class="button button-primary"
@@ -384,23 +380,19 @@ const structuredData = pageUrl
 						>
 							{primaryLabel}
 						</a>
-						{ctaMode === "email" && (
-							<p class="launch-note">This opens your email app.</p>
-						)}
 					</div>
 				)
 			}
 
 			<p class="product-support">
-				Questions? <a href={supportHref}>{supportLabel}</a>.
-				{
-					vatLoomConfig.privacyUrl && (
-						<>
-							{" "}
-							<a href={vatLoomConfig.privacyUrl}>Privacy policy</a>.
-						</>
-					)
-				}
+				Questions? <a href={supportHref}>{supportLabel}</a>.{" "}
+				<a
+					href={vatLoomConfig.privacyUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					VatLoom app privacy
+				</a>.
 			</p>
 		</div>
 	</section>
@@ -494,12 +486,6 @@ const structuredData = pageUrl
 		gap: var(--space-4);
 		flex-wrap: wrap;
 		margin-top: var(--space-8);
-	}
-
-	.product-cta-note {
-		margin: var(--space-3) 0 0;
-		color: var(--color-muted);
-		font-size: 0.85rem;
 	}
 
 	.product-hero-report {
@@ -830,12 +816,6 @@ const structuredData = pageUrl
 		gap: var(--space-4);
 		flex-wrap: wrap;
 		margin-top: var(--space-6);
-	}
-
-	.launch-note {
-		margin: 0;
-		color: var(--color-muted);
-		font-size: 0.85rem;
 	}
 
 	.product-support {

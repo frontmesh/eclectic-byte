@@ -1,0 +1,97 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import { buildAbsoluteUrl, siteConfig, vatLoomConfig } from "../../site-config";
+
+const description =
+	"How Eclectic Byte handles launch-update emails, website data, and links to the VatLoom app privacy policy.";
+const contactEmail = siteConfig.founder.email;
+const privacyUrl = buildAbsoluteUrl(siteConfig.privacyPath);
+const structuredData = privacyUrl
+	? {
+			"@context": "https://schema.org",
+			"@type": "WebPage",
+			name: "Privacy policy",
+			description,
+			url: privacyUrl,
+			isPartOf: siteConfig.siteUrl
+		}
+	: [];
+---
+
+<PageLayout
+	title={`Privacy policy | ${siteConfig.siteName}`}
+	description={description}
+	pathname={siteConfig.privacyPath}
+	eyebrow="Privacy"
+	heading="Privacy policy"
+	intro="How I handle launch-update emails on this site, and where to find the VatLoom app policy."
+	meta={{ datetime: "2026-10-21", label: "Last updated October 21, 2026" }}
+	ogType="article"
+	structuredData={structuredData}
+>
+	<div class="legal-prose">
+		<h2>Who I am</h2>
+		<p>
+			Eclectic Byte is operated by Vladimir Vujosevic in the Netherlands. For privacy
+			questions or requests, email <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+		</p>
+
+		<h2>Launch-update emails</h2>
+		<p>
+			If you submit your email address to get VatLoom launch updates, I collect that address
+			and the subscription date. I use it only to send updates about VatLoom's launch. I do
+			not use it for unrelated marketing.
+		</p>
+		<p>
+			I use Buttondown to manage the list and send these emails. Buttondown processes the
+			email address on my behalf. You can read
+			<a
+				href="https://buttondown.com/legal/privacy"
+				target="_blank"
+				rel="noopener noreferrer">Buttondown's privacy policy</a
+			>.
+		</p>
+		<p>
+			I rely on your consent. You can withdraw it at any time using the unsubscribe link in
+			every email or by emailing me. I keep your address while you are subscribed. After you
+			unsubscribe, I will stop sending you launch updates, and you can ask me to delete your
+			address. I do not sell it or share it for advertising.
+		</p>
+
+		<h2>This website</h2>
+		<p>
+			This site is hosted on Cloudflare Pages. Cloudflare processes requests on my behalf so
+			the site can be served. I do not add analytics or advertising cookies to this site.
+		</p>
+		<p>
+			The signup form submits to Buttondown. Buttondown's confirmation page may set its own
+			cookies; its privacy policy explains how Buttondown handles that data.
+		</p>
+
+		<h2>VatLoom app data</h2>
+		<p>
+			The VatLoom Shopify app has a separate privacy policy covering the Shopify data it
+			accesses and stores:
+			<a
+				href={vatLoomConfig.privacyUrl}
+				target="_blank"
+				rel="noopener noreferrer">VatLoom app privacy policy</a
+			>.
+		</p>
+
+		<h2>Your rights</h2>
+		<p>
+			You can ask for access, correction, deletion, or a copy of your launch-update email
+			data, and you can object to processing or withdraw consent. Email
+			<a href={`mailto:${contactEmail}`}>{contactEmail}</a>. You can also complain to the
+			<a
+				href="https://www.autoriteitpersoonsgegevens.nl/en"
+				target="_blank"
+				rel="noopener noreferrer">Dutch Data Protection Authority</a
+			>.
+		</p>
+
+		<h2>Changes</h2>
+		<p>If this policy changes, I will update the date on this page.</p>
+	</div>
+</PageLayout>

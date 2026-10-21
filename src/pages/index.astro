@@ -19,7 +19,7 @@ const isVatLoomLive = vatLoomConfig.status === "live";
 const vatLoomStatusLabel = isVatLoomLive ? "Available now" : "In Shopify review";
 const vatLoomPanelExternal = isVatLoomLive && Boolean(vatLoomConfig.listingUrl);
 let vatLoomPanelHref = `${vatLoomConfig.path}#launch-list`;
-let vatLoomPanelLabel = "Join the launch list";
+let vatLoomPanelLabel = "Get the launch email";
 
 if (vatLoomPanelExternal) {
 	vatLoomPanelHref = vatLoomConfig.listingUrl;

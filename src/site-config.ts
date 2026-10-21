@@ -4,13 +4,14 @@ export const siteConfig = {
 	siteName: "Eclectic Byte",
 	siteTagline: "Specialized software for practical problems.",
 	siteDescription:
-		"Vladimir Vujosevic builds VatLoom, Habitoro, and small iOS utilities, plus private commerce integrations for Shopify stores.",
+		"Vladimir Vujosevic builds VatLoom, Habitoro, and focused iOS utilities, plus private commerce integrations for Shopify stores.",
 	siteUrl: siteUrlValue,
 	locale: "en_US",
 	dateLocale: "en-US",
 	socialCardPath: "/social-card.svg",
 	brandMarkPath: "/brand/eclectic-byte-mark.svg",
 	brandMarkType: "image/svg+xml",
+	privacyPath: "/privacy/",
 	companyType: "Organization",
 	founder: {
 		name: "Vladimir Vujosevic",
@@ -25,7 +26,6 @@ interface VatLoomConfig {
 	path: string;
 	status: VatLoomStatus;
 	listingUrl: string;
-	launchListUrl: string;
 	buttondownUsername: string;
 	privacyUrl: string;
 	supportUrl: string;
@@ -35,7 +35,6 @@ interface VatLoomConfig {
 	currency: string;
 	tagline: string;
 	description: string;
-	launchListSubject: string;
 }
 
 export const vatLoomConfig: VatLoomConfig = {
@@ -43,8 +42,7 @@ export const vatLoomConfig: VatLoomConfig = {
 	path: "/vatloom/",
 	status: "review",
 	listingUrl: "",
-	launchListUrl: "",
-	buttondownUsername: "",
+	buttondownUsername: "eclecticbyte",
 	privacyUrl: "https://vatloom-public.proptech.workers.dev/privacy",
 	supportUrl: "https://vatloom-public.proptech.workers.dev/support",
 	trialDays: 14,
@@ -53,8 +51,7 @@ export const vatLoomConfig: VatLoomConfig = {
 	currency: "USD",
 	tagline: "EU OSS VAT reports from Shopify, without the spreadsheet.",
 	description:
-		"VatLoom organizes Shopify orders and refunds into country-and-rate OSS summaries and exportable working papers.",
-	launchListSubject: "VatLoom launch list"
+		"VatLoom organizes Shopify orders and refunds into country-and-rate OSS summaries and exportable working papers."
 };
 
 export const habitoroConfig = {
