@@ -10,7 +10,9 @@ const sparkConfig = {
 	repelRadius: 150,
 	repelForce: 30,
 	fpsCap: 60,
-	dprCap: 1.5
+	dprCap: 1.5,
+	textRadiusScale: 2.5,
+	textAlphaScale: 0.7
 };
 
 const bokehConfig = {
@@ -22,13 +24,22 @@ const bokehConfig = {
 	radiusMax: 100,
 	alphaMin: 0.05,
 	alphaMax: 0.11,
-	textDistance: 320,
 	textRadiusScale: 2.8,
-	textAlphaScale: 0.85
+	textAlphaScale: 0.7
+};
+
+const textProximityConfig = {
+	distance: 320
 };
 ---
 
-<div class="scene" data-scene-root data-scene-content=".page-shell" aria-hidden="true">
+<div
+	class="scene"
+	data-scene-root
+	data-scene-content=".page-shell"
+	data-scene-text-distance={textProximityConfig.distance}
+	aria-hidden="true"
+>
 	<div class="scene-fog scene-fog-navy"></div>
 	<div class="scene-fog scene-fog-orange"></div>
 	<div class="scene-mark-center">
@@ -65,6 +76,8 @@ const bokehConfig = {
 		data-repel-force={sparkConfig.repelForce}
 		data-fps-cap={sparkConfig.fpsCap}
 		data-dpr-cap={sparkConfig.dprCap}
+		data-spark-text-radius-scale={sparkConfig.textRadiusScale}
+		data-spark-text-alpha-scale={sparkConfig.textAlphaScale}
 		data-bokeh-min-width={bokehConfig.minWidth}
 		data-bokeh-min={bokehConfig.minCount}
 		data-bokeh-max={bokehConfig.maxCount}
@@ -73,7 +86,6 @@ const bokehConfig = {
 		data-bokeh-radius-max={bokehConfig.radiusMax}
 		data-bokeh-alpha-min={bokehConfig.alphaMin}
 		data-bokeh-alpha-max={bokehConfig.alphaMax}
-		data-bokeh-text-distance={bokehConfig.textDistance}
 		data-bokeh-text-radius-scale={bokehConfig.textRadiusScale}
 		data-bokeh-text-alpha-scale={bokehConfig.textAlphaScale}
 	></canvas>

@@ -8,6 +8,8 @@ interface SparkTuning {
 	repelForce: number;
 	fpsCap: number;
 	dprCap: number;
+	textRadiusScale: number;
+	textAlphaScale: number;
 }
 
 interface BokehTuning {
@@ -19,7 +21,6 @@ interface BokehTuning {
 	radiusMax: number;
 	alphaMin: number;
 	alphaMax: number;
-	textDistance: number;
 	textRadiusScale: number;
 	textAlphaScale: number;
 }
@@ -83,11 +84,11 @@ const SWAY_AMPLITUDE_FLOOR = 6;
 const SWAY_AMPLITUDE_JITTER = 14;
 const SPARK_SPRITE_SIZE = 48;
 
-type SpriteProfile = "soft" | "diffuse";
+type SpriteProfile = "soft" | "haze";
 
 const SPRITE_PROFILES: Record<SpriteProfile, { stops: readonly number[]; alphas: readonly number[] }> = {
 	soft: { stops: [0, 0.35, 1], alphas: [1, 0.42, 0] },
-	diffuse: { stops: [0, 0.4, 0.7, 1], alphas: [0.55, 0.34, 0.14, 0] }
+	haze: { stops: [0, 0.2, 0.45, 0.7, 0.9, 1], alphas: [0.42, 0.38, 0.27, 0.14, 0.04, 0] }
 };
 
 const ORANGE_SPARK_WEIGHT = 3;
@@ -109,6 +110,8 @@ const BOKEH_SWAY_BASELINE = 0.02;
 const BOKEH_SWAY_JITTER = 0.04;
 const BOKEH_BOUNCE_MARGIN = 0.5;
 
+const DEFAULT_TEXT_DISTANCE = 320;
+
 const DEFAULT_TUNING: SparkTuning = {
 	maxSparks: 110,
 	minSparks: 26,
@@ -118,7 +121,9 @@ const DEFAULT_TUNING: SparkTuning = {
 	repelRadius: 150,
 	repelForce: 30,
 	fpsCap: 60,
-	dprCap: 1.5
+	dprCap: 1.5,
+	textRadiusScale: 2.5,
+	textAlphaScale: 0.7
 };
 
 const DEFAULT_BOKEH_TUNING: BokehTuning = {
@@ -130,9 +135,8 @@ const DEFAULT_BOKEH_TUNING: BokehTuning = {
 	radiusMax: 100,
 	alphaMin: 0.05,
 	alphaMax: 0.11,
-	textDistance: 320,
 	textRadiusScale: 2.8,
-	textAlphaScale: 0.85
+	textAlphaScale: 0.7
 };
 
 function clamp(value: number, min: number, max: number): number {
@@ -170,7 +174,9 @@ function readTuning(dataset: DOMStringMap): SparkTuning {
 		repelRadius: readNumber(dataset.repelRadius, DEFAULT_TUNING.repelRadius, 20, 600),
 		repelForce: readNumber(dataset.repelForce, DEFAULT_TUNING.repelForce, 1, 200),
 		fpsCap: readNumber(dataset.fpsCap, DEFAULT_TUNING.fpsCap, 10, 120),
-		dprCap: readNumber(dataset.dprCap, DEFAULT_TUNING.dprCap, DPR_FLOOR, 3)
+		dprCap: readNumber(dataset.dprCap, DEFAULT_TUNING.dprCap, DPR_FLOOR, 3),
+		textRadiusScale: readNumber(dataset.sparkTextRadiusScale, DEFAULT_TUNING.textRadiusScale, 1, 4),
+		textAlphaScale: readNumber(dataset.sparkTextAlphaScale, DEFAULT_TUNING.textAlphaScale, 0, 1)
 	};
 }
 
@@ -184,7 +190,6 @@ function readBokehTuning(dataset: DOMStringMap): BokehTuning {
 		radiusMax: readNumber(dataset.bokehRadiusMax, DEFAULT_BOKEH_TUNING.radiusMax, 8, 600),
 		alphaMin: readNumber(dataset.bokehAlphaMin, DEFAULT_BOKEH_TUNING.alphaMin, 0, 1),
 		alphaMax: readNumber(dataset.bokehAlphaMax, DEFAULT_BOKEH_TUNING.alphaMax, 0, 1),
-		textDistance: readNumber(dataset.bokehTextDistance, DEFAULT_BOKEH_TUNING.textDistance, 1, 2000),
 		textRadiusScale: readNumber(dataset.bokehTextRadiusScale, DEFAULT_BOKEH_TUNING.textRadiusScale, 1, 4),
 		textAlphaScale: readNumber(dataset.bokehTextAlphaScale, DEFAULT_BOKEH_TUNING.textAlphaScale, 0, 1)
 	};
@@ -295,6 +300,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 	const effectiveFpsCap = finePointer.matches ? tuning.fpsCap : Math.min(tuning.fpsCap, FPS_FLOOR_COARSE);
 	const frameInterval = 1000 / effectiveFpsCap;
 	const contentSelector = root?.dataset.sceneContent;
+	const textDistance = readNumber(root?.dataset.sceneTextDistance, DEFAULT_TEXT_DISTANCE, 1, 2000);
 	const sprites = new Map<string, HTMLCanvasElement>();
 
 	let sparks: Spark[] = [];
@@ -368,12 +374,12 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 			distance = x - contentRight;
 		}
 
-		return smoothstep(clamp(1 - distance / bokehTuning.textDistance, 0, 1));
+		return smoothstep(clamp(1 - distance / textDistance, 0, 1));
 	}
 
 	function createSpark(): Spark | undefined {
 		const color = palette[Math.floor(Math.random() * palette.length)];
-		if (!color || !ensureSprite(color, "soft")) {
+		if (!color || !ensureSprite(color, "soft") || !ensureSprite(color, "haze")) {
 			return undefined;
 		}
 
@@ -453,7 +459,7 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 			return undefined;
 		}
 
-		if (!ensureSprite(style.color, "soft") || !ensureSprite(style.color, "diffuse")) {
+		if (!ensureSprite(style.color, "soft") || !ensureSprite(style.color, "haze")) {
 			return undefined;
 		}
 
@@ -601,24 +607,38 @@ export function initBackgroundScene(canvas: HTMLCanvasElement): () => void {
 			}
 
 			if (blur > 0) {
-				const diffuse = sprites.get(spriteKeyFor(blob.colorKey, "diffuse"));
-				if (diffuse) {
+				const haze = sprites.get(spriteKeyFor(blob.colorKey, "haze"));
+				if (haze) {
 					context.globalAlpha = alpha * blur;
-					context.drawImage(diffuse, drawX, drawY, size, size);
+					context.drawImage(haze, drawX, drawY, size, size);
 				}
 			}
 		}
 
 		for (const spark of sparks) {
-			const sprite = sprites.get(spriteKeyFor(spark.colorKey, "soft"));
-			if (!sprite) {
-				continue;
+			const sway = Math.sin(elapsed * spark.swayFrequency * Math.PI * 2 + spark.phase) * spark.swayAmplitude;
+			const centerX = spark.x + sway;
+			const blur = textBlurFactor(centerX);
+			const size = spark.radius * 4 * lerp(1, tuning.textRadiusScale, blur);
+			const alpha = spark.alpha * lerp(1, tuning.textAlphaScale, blur);
+			const drawX = centerX - size / 2;
+			const drawY = spark.y - size / 2;
+
+			if (blur < 1) {
+				const soft = sprites.get(spriteKeyFor(spark.colorKey, "soft"));
+				if (soft) {
+					context.globalAlpha = alpha * (1 - blur);
+					context.drawImage(soft, drawX, drawY, size, size);
+				}
 			}
 
-			const sway = Math.sin(elapsed * spark.swayFrequency * Math.PI * 2 + spark.phase) * spark.swayAmplitude;
-			const size = spark.radius * 4;
-			context.globalAlpha = spark.alpha;
-			context.drawImage(sprite, spark.x + sway - size / 2, spark.y - size / 2, size, size);
+			if (blur > 0) {
+				const haze = sprites.get(spriteKeyFor(spark.colorKey, "haze"));
+				if (haze) {
+					context.globalAlpha = alpha * blur;
+					context.drawImage(haze, drawX, drawY, size, size);
+				}
+			}
 		}
 
 		context.globalAlpha = 1;
