@@ -85,11 +85,10 @@ const SPARK_SPRITE_SIZE = 48;
 
 type SpriteProfile = "soft" | "diffuse";
 
-const SPRITE_PROFILES: Record<SpriteProfile, { stops: readonly [number, number, number]; alphas: readonly [number, number, number] }> =
-	{
-		soft: { stops: [0, 0.35, 1], alphas: [1, 0.42, 0] },
-		diffuse: { stops: [0, 0.45, 1], alphas: [0.5, 0.26, 0] }
-	};
+const SPRITE_PROFILES: Record<SpriteProfile, { stops: readonly number[]; alphas: readonly number[] }> = {
+	soft: { stops: [0, 0.35, 1], alphas: [1, 0.42, 0] },
+	diffuse: { stops: [0, 0.4, 0.7, 1], alphas: [0.55, 0.34, 0.14, 0] }
+};
 
 const ORANGE_SPARK_WEIGHT = 3;
 const DPR_FLOOR = 1;
@@ -99,7 +98,7 @@ const BOKEH_NAVY_ALPHA_SCALE = 0.45;
 const BOKEH_SPEED_FLOOR = 3;
 const BOKEH_SPEED_JITTER = 4;
 const BOKEH_RADIUS_MARGIN = 0.6;
-const BOKEH_DEPTH_BIAS = 1.8;
+const BOKEH_DEPTH_BIAS = 1.15;
 const BOKEH_MAX_DEPTH_FRACTION = 0.48;
 const BOKEH_SIDE_LEFT = 0.5;
 const BOKEH_PERIOD_FLOOR = 20;
@@ -131,9 +130,9 @@ const DEFAULT_BOKEH_TUNING: BokehTuning = {
 	radiusMax: 100,
 	alphaMin: 0.05,
 	alphaMax: 0.11,
-	textDistance: 220,
-	textRadiusScale: 1.5,
-	textAlphaScale: 0.35
+	textDistance: 320,
+	textRadiusScale: 2.8,
+	textAlphaScale: 0.85
 };
 
 function clamp(value: number, min: number, max: number): number {
